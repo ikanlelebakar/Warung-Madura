@@ -7,7 +7,12 @@
 
 
 class Kasir {
-
+    public:
+        void menuKasir();
+        int pilihMenu();
+        int Pilihan;
+    private:
+        int menuBelanja();
 };
 
 

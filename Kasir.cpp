@@ -3,3 +3,53 @@
 //
 
 #include "Kasir.h"
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void Kasir::menuKasir() {
+    cout << "\n===============================" << endl;
+    cout << "SELAMAT DATANG DI MENU KASIR" << endl;
+    cout << "===============================" << endl;
+    cout << "\t\tMENU" << endl;
+    cout << "1. LANJUT KE DAFTAR BELANJA" << endl;
+    cout << "2. KEMBALI" << endl;
+    cout << "===============================" << endl;
+}
+
+int Kasir::menuBelanja() {
+    vector<int> stockCodeBatang = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int codeBarang, jumlahBarang;
+
+    cout << "Input Code Barang : ";
+    cin >> codeBarang;
+
+    for (int i = 0; i < stockCodeBatang.size(); i++) {
+        if (codeBarang == stockCodeBatang[i]) {
+            cout << "Jumlah Barang : ";
+            cin >> jumlahBarang;
+            return 1;
+        }
+    }
+    cout << "\nBarang tidak ada di database\n";
+    return 0;
+}
+
+int Kasir::pilihMenu() {
+    cout << "Silahkan Pilih Menu (1/2) : "; cin >> Pilihan;
+    switch (Pilihan) {
+        case 1:
+            menuBelanja();
+            return 0;
+        case 2:
+            return 2;
+        default:
+            cout << "Input anda tidak valid\n\n";
+            break;
+    }
+    return 1;
+}
+
+// int main() {
+//     menuBelanja();
+// }

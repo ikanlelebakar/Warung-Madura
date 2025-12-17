@@ -1,35 +1,48 @@
 #include <iostream>
-#include <vector>
-#include <string>
+#include "Kasir.h"
 using namespace std;
+Kasir kasir;
 
-struct Barang {
-    string nama;
-    int stock;
-    double harga;
-};
+void Menu() {
+    cout << "===============================" << endl;
+    cout << "SELAMAT DATANG DI WARUNG MADURA" << endl;
+    cout << "===============================" << endl;
+    cout << "\t\t\tMENU" << endl;
+    cout << "1. KASIR" << endl;
+    cout << "2. STOCK" << endl;
+    cout << "3. KEUANGAN" << endl;
+    cout << "4. KELUAR" << endl;
+    cout << "===============================" << endl;
+}
 
 int main() {
-    Barang b;
-    vector<Barang> barang;
+    int Pilihan;
 
-    cout << "Masukkan 0 apabila ingin berhenti" << endl;
-    while (true) {
-        cout << "Masukkan nama barang : "; getline(cin, b.nama);
-        if (b.nama == "0") {
-            break;
+    do {
+        Menu();
+        cout << "Silahkan Pilih Menu (1/2/3/4) : "; cin >> kasir.Pilihan;
+        switch (kasir.Pilihan) {
+            case 1:
+                kasir.menuKasir();
+                if (kasir.pilihMenu() == 2) {
+                    break;
+                }
+                kasir.menuKasir();
+                kasir.pilihMenu();
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                cout << "Terimakasih Telah Menggunakan Program Ini" << endl;
+                break;
+            default:
+                cout << "MASUKANA ANDA TIDAK VALID, SILAHKAN MENGULANG\n\n";
+                break;
         }
-        cout << "Masukkan stock barang : "; cin >> b.stock;
-        cout << "Masukkan harga barang : "; cin >> b.harga;
-        cin.ignore();
+    } while (kasir.Pilihan != 4);
+    cin.ignore();
 
-        barang.push_back(b);
-    }
-
-    for (size_t i = 0; i < barang.size(); i++) {
-        cout << i+1 << ". "
-        << "nama barang = " << barang[i].nama << " | "
-        << "stock barang = " << barang[i].stock << " | "
-        << "harga barang = " << barang[i].harga << " | " << endl;
-    }
+    return 0;
 }
