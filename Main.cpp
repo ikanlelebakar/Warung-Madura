@@ -7,7 +7,7 @@ void Menu() {
     cout << "===============================" << endl;
     cout << "SELAMAT DATANG DI WARUNG MADURA" << endl;
     cout << "===============================" << endl;
-    cout << "\t\t\tMENU" << endl;
+    cout << "\t\tMENU" << endl;
     cout << "1. KASIR" << endl;
     cout << "2. STOCK" << endl;
     cout << "3. KEUANGAN" << endl;

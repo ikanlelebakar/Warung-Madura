@@ -5,6 +5,8 @@
 #include "Kasir.h"
 #include <iostream>
 #include <vector>
+
+#include "Database.h"
 using namespace std;
 
 void Kasir::menuKasir() {
@@ -18,21 +20,25 @@ void Kasir::menuKasir() {
 }
 
 int Kasir::menuBelanja() {
-    vector<int> stockCodeBatang = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     int codeBarang, jumlahBarang;
 
     cout << "Input Code Barang : ";
     cin >> codeBarang;
 
-    for (int i = 0; i < stockCodeBatang.size(); i++) {
-        if (codeBarang == stockCodeBatang[i]) {
-            cout << "Jumlah Barang : ";
-            cin >> jumlahBarang;
-            return 1;
+    for (auto &barang : datasetBarang) {
+        if (barang.codeBarang == codeBarang) {
+            cout << "Masukkan jumlah barang : "; cin >> jumlahBarang;
+            if (barang.jumlahBarang < jumlahBarang) {
+                cout << "Stock tidak mencukupi" << endl;
+                return 0;
+            }
         }
+        cout << "Stock cukup" << endl;
+        return 1;
     }
+
     cout << "\nBarang tidak ada di database\n";
-    return 0;
+    return 1;
 }
 
 int Kasir::pilihMenu() {
@@ -42,7 +48,7 @@ int Kasir::pilihMenu() {
             menuBelanja();
             return 0;
         case 2:
-            return 2;
+            return 1;
         default:
             cout << "Input anda tidak valid\n\n";
             break;
