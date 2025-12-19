@@ -1,7 +1,10 @@
 #include <iostream>
+
+#include "Database.h"
 #include "Kasir.h"
 using namespace std;
 Kasir kasir;
+Database db;
 
 void Menu() {
     cout << "===============================" << endl;
@@ -31,6 +34,7 @@ int main() {
                 kasir.pilihMenu();
                 break;
             case 2:
+                db.tampilBarang();
                 break;
             case 3:
                 break;

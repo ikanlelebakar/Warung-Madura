@@ -8,6 +8,7 @@
 
 #include "Database.h"
 using namespace std;
+vector<ItemBelanja> keranjang;
 
 void Kasir::menuKasir() {
     cout << "\n===============================" << endl;
@@ -21,24 +22,75 @@ void Kasir::menuKasir() {
 
 int Kasir::menuBelanja() {
     int codeBarang, jumlahBarang;
+    char pilihan;
 
-    cout << "Input Code Barang : ";
-    cin >> codeBarang;
+    do {
+        bool ditemukan = false;
 
-    for (auto &barang : datasetBarang) {
-        if (barang.codeBarang == codeBarang) {
-            cout << "Masukkan jumlah barang : "; cin >> jumlahBarang;
-            if (barang.jumlahBarang < jumlahBarang) {
-                cout << "Stock tidak mencukupi" << endl;
-                return 0;
+        cout << "Input Code Barang : ";
+        cin >> codeBarang;
+
+        for (auto &barang : datasetBarang) {
+            if (barang.codeBarang == codeBarang) {
+                ditemukan = true;
+
+                cout << "Masukkan jumlah barang : ";
+                cin >> jumlahBarang;
+
+                if (jumlahBarang > barang.jumlahBarang) {
+                    cout << "Stock tidak mencukupi\n";
+                    break;
+                }
+                keranjang.push_back({codeBarang, jumlahBarang});
+                barang.jumlahBarang -= jumlahBarang;
+                cout << "Barang ditambahkan ke keranjang\n";
+                break;
             }
         }
-        cout << "Stock cukup" << endl;
-        return 1;
+        if (!ditemukan) {
+            cout << "Barang tidak ada di database\n";
+        }
+        cout << "Apakah ingin menambahkan produk lagi (y/n)? ";
+        cin >> pilihan;
+    } while (pilihan == 'y' || pilihan == 'Y');
+
+    checkout();
+
+    return 1;
+}
+
+void Kasir::tampilKeranjang() {
+    for (const auto &item : keranjang) {
+        cout << "Code Barang: " << item.codeBarang << " | Jumlah: " << item.jumlah << endl;
+    }
+}
+
+void Kasir::checkout() {
+    char pilihan;
+
+    cout << "\n===== CHECKOUT =====\n";
+    tampilKeranjang();
+
+    cout << "\nKonfirmasi transaksi? (y = bayar / n = batal): ";
+    cin >> pilihan;
+
+    if (pilihan == 'y' || pilihan == 'Y') {
+        cout << "Transaksi berhasil. Terima kasih.\n";
+        keranjang.clear(); // transaksi selesai
+        return;
     }
 
-    cout << "\nBarang tidak ada di database\n";
-    return 1;
+    for (const auto &item : keranjang) {
+        for (auto &barang : datasetBarang) {
+            if (barang.codeBarang == item.codeBarang) {
+                barang.jumlahBarang += item.jumlah;
+                break;
+            }
+        }
+    }
+
+    keranjang.clear();
+    cout << "Transaksi dibatalkan. Stok dikembalikan.\n";
 }
 
 int Kasir::pilihMenu() {
@@ -48,7 +100,7 @@ int Kasir::pilihMenu() {
             menuBelanja();
             return 0;
         case 2:
-            return 1;
+            return 2;
         default:
             cout << "Input anda tidak valid\n\n";
             break;
