@@ -8,6 +8,7 @@
 
 struct ItemBelanja {
     int codeBarang, jumlah;
+    double harga;
 };
 
 class Kasir {

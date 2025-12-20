@@ -11,4 +11,6 @@ add_executable(Iventaris_Dan_Keuangan_Konsep
         Kasir.h
         Database.cpp
         Database.h
+        Stock.cpp
+        Stock.h
 )

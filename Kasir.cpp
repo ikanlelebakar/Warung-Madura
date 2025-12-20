@@ -3,10 +3,11 @@
 //
 
 #include "Kasir.h"
+#include "Database.h"
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
-#include "Database.h"
 using namespace std;
 vector<ItemBelanja> keranjang;
 
@@ -41,7 +42,7 @@ int Kasir::menuBelanja() {
                     cout << "Stock tidak mencukupi\n";
                     break;
                 }
-                keranjang.push_back({codeBarang, jumlahBarang});
+                keranjang.push_back({codeBarang, jumlahBarang, barang.hargaBarang});
                 barang.jumlahBarang -= jumlahBarang;
                 cout << "Barang ditambahkan ke keranjang\n";
                 break;
@@ -60,9 +61,30 @@ int Kasir::menuBelanja() {
 }
 
 void Kasir::tampilKeranjang() {
+    double total = 0;
+
+    cout << "\n===== KERANJANG BELANJA =====\n";
+    cout << left
+         << setw(12) << "Code"
+         << setw(12) << "Jumlah"
+         << setw(15) << "Harga"
+         << setw(15) << "Subtotal"
+         << endl;
+
+    cout << string(54, '-') << endl;
     for (const auto &item : keranjang) {
-        cout << "Code Barang: " << item.codeBarang << " | Jumlah: " << item.jumlah << endl;
+        double subtotal = item.harga * item.jumlah;
+        total += subtotal;
+
+        cout << left
+             << setw(12) << item.codeBarang
+             << setw(12) << item.jumlah
+             << setw(15) << item.harga
+             << setw(15) << subtotal
+             << endl;
     }
+    cout << string(54, '-') << endl;
+    cout << right << setw(30) << "TOTAL HARGA: " << total << endl;
 }
 
 void Kasir::checkout() {
@@ -79,7 +101,6 @@ void Kasir::checkout() {
         keranjang.clear(); // transaksi selesai
         return;
     }
-
     for (const auto &item : keranjang) {
         for (auto &barang : datasetBarang) {
             if (barang.codeBarang == item.codeBarang) {
@@ -88,7 +109,6 @@ void Kasir::checkout() {
             }
         }
     }
-
     keranjang.clear();
     cout << "Transaksi dibatalkan. Stok dikembalikan.\n";
 }
@@ -107,7 +127,3 @@ int Kasir::pilihMenu() {
     }
     return 1;
 }
-
-// int main() {
-//     menuBelanja();
-// }
