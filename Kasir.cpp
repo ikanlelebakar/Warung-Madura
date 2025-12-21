@@ -20,6 +20,8 @@ void Kasir::menuKasir() {
 int Kasir::menuBelanja() {
     int codeBarang, jumlahBarang;
     char pilihan;
+    Database database;
+    database.loadFromJson("../database.json");
 
     do {
         bool ditemukan = false;

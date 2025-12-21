@@ -1,6 +1,7 @@
 #include "Kasir.h"
 #include "Stock.h"
 #include <iostream>
+
 using namespace std;
 Kasir kasir;
 Stock stock;
@@ -18,8 +19,6 @@ void Menu() {
 }
 
 int main() {
-    int Pilihan;
-
     do {
         Menu();
         cout << "Silahkan Pilih Menu (1/2/3/4) : "; cin >> kasir.Pilihan;

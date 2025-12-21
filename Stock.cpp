@@ -1,7 +1,7 @@
 #include "Stock.h"
 #include "Database.h"
 #include <iostream>
-Database db;
+
 using namespace std;
 
 void Stock::menuStock() {
@@ -35,13 +35,17 @@ int Stock::tambahBarang() {
 }
 
 int Stock::pilihEditMenu() {
+    Database database;
+
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
-            db.tampilBarang();
+            database.loadFromJson("../database.json");
+            database.tampilBarang();
             return 1;
         case 2:
-            db.tampilBarang();
+            database.loadFromJson("../database.json");
+            database.tampilBarang();
             return 0;
         case 3:
             return 2;
@@ -64,15 +68,16 @@ int Stock::kembali() {
 }
 
 int Stock::pilihMenu() {
+    Database database;
+
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
-            db.tampilBarang();
+            database.tampilBarang();
             return kembali();
         case 2:
             menuEdit();
             pilihEditMenu();
-
             return 0;
         case 3:
             return 2;
@@ -80,5 +85,4 @@ int Stock::pilihMenu() {
             cout << "Input anda tidak valid\n\n";
             break;
     }
-    return 1;
 }

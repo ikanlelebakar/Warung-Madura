@@ -4,15 +4,9 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
-using json = nlohmann::json;
 
-std::vector<Database::barang> datasetBarang = {
-    {"Ayam", 1000, 10, 20000},
-    {"Sapi", 1001, 20, 200000},
-    {"Kambing", 1002, 4, 100000},
-    {"Kangkung", 1003, 7, 5000},
-    {"Coca Cola", 1004, 9, 8000},
-};
+using json = nlohmann::json;
+std::vector<Database::barang> datasetBarang;
 
 void Database::loadFromJson(const std::string& fileName) {
     std::ifstream file(fileName);
