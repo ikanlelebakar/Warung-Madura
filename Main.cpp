@@ -1,10 +1,9 @@
-#include <iostream>
-
-#include "Database.h"
 #include "Kasir.h"
+#include "Stock.h"
+#include <iostream>
 using namespace std;
 Kasir kasir;
-Database db;
+Stock stock;
 
 void Menu() {
     cout << "===============================" << endl;
@@ -34,7 +33,9 @@ int main() {
                 kasir.pilihMenu();
                 break;
             case 2:
-                db.tampilBarang();
+                do {
+                    stock.menuStock();
+                } while (stock.pilihMenu() != 2);
                 break;
             case 3:
                 break;

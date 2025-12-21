@@ -1,7 +1,3 @@
-//
-// Created by User on 12/18/2025.
-//
-
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_DATABASE_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_DATABASE_H
 
@@ -9,13 +5,18 @@
 #include <vector>
 
 class Database {
-    public:
-        struct barang {
-            std::string nama;
-            int codeBarang, jumlahBarang;
-            double hargaBarang;
-        };
-        void tampilBarang();
+public:
+    struct barang {
+        std::string nama;
+        int codeBarang, jumlahBarang;
+        double hargaBarang;
+    };
+
+    void tampilBarang();
+
+    void loadFromJson(const std::string& fileName);
+    void saveToJson(const std::string& fileName);
+    bool updateStok(int codeBarang, int stokBaru);
 };
 
 extern std::vector<Database::barang> datasetBarang;

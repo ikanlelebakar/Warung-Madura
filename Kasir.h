@@ -1,7 +1,3 @@
-//
-// Created by faishal on 12/17/25.
-//
-
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #include <vector>
