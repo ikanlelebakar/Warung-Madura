@@ -27,8 +27,12 @@ int Kasir::menuBelanja() {
     do {
         bool ditemukan = false;
 
-        cout << "Input Code Barang : ";
+        cout << "Input Code Barang (0 untuk kembali) : ";
         cin >> codeBarang;
+
+        if (codeBarang == 0) {
+            return false;
+        }
 
         for (auto &barang : datasetBarang) {
             if (barang.codeBarang == codeBarang) {

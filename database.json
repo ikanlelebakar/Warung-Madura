@@ -2,39 +2,15 @@
     "barang": [
         {
             "codeBarang": 1000,
-            "hargaBarang": 20000.0,
-            "jumlahBarang": 10,
-            "nama": "Ayam"
+            "hargaBarang": 13000.0,
+            "jumlahBarang": 14,
+            "nama": "ayam_goreng"
         },
         {
             "codeBarang": 1001,
-            "hargaBarang": 200000.0,
-            "jumlahBarang": 20,
-            "nama": "Sapi"
-        },
-        {
-            "codeBarang": 1002,
-            "hargaBarang": 100000.0,
+            "hargaBarang": 40000.0,
             "jumlahBarang": 10,
-            "nama": "Kambing"
-        },
-        {
-            "codeBarang": 1003,
-            "hargaBarang": 5000.0,
-            "jumlahBarang": 7,
-            "nama": "Kangkung"
-        },
-        {
-            "codeBarang": 1004,
-            "hargaBarang": 8000.0,
-            "jumlahBarang": 9,
-            "nama": "Coca Cola"
-        },
-        {
-            "codeBarang": 1005,
-            "hargaBarang": 20000.0,
-            "jumlahBarang": 9,
-            "nama": "Kura Kura"
+            "nama": "ayam bakar"
         }
     ]
 }

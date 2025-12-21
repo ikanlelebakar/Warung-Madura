@@ -2,6 +2,7 @@
 #include "Database.h"
 #include <iostream>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ void Stock::menuStock() {
     cout << "SELAMAT DATANG DI MENU STOCK" << endl;
     cout << "================================" << endl;
     cout << "\t\tMENU" << endl;
-    cout << "1. LANJUT KE DAFTAR STOCK" << endl;
+    cout << "1. DAFTAR STOCK" << endl;
     cout << "2. EDIT STOCK" << endl;
     cout << "3. KEMBALI" << endl;
     cout << "================================" << endl;
@@ -46,14 +47,15 @@ int Stock::ubahStock() {
             cout << "Nama   : " << barang.nama << endl;
             cout << "Code   : " << barang.codeBarang << endl;
             cout << "Jumlah : " << barang.jumlahBarang << endl;
+            cout << "Harga  : " << barang.hargaBarang << endl;
 
             cout << "\nMasukkan data baru\n";
-            cout << "Nama Barang   : ";
+            cout << "Nama Barang (untuk spasi gunakan '_' debagai pengganti)  : ";
             cin.ignore();
             getline(cin, barang.nama);
 
-            cout << "Code Barang   : "; cin >> barang.codeBarang;
             cout << "Jumlah Barang : "; cin >> barang.jumlahBarang;
+            cout << "Harga Barang  : "; cin >> barang.hargaBarang;
 
             database.saveToJson("../database.json");
 
@@ -130,23 +132,31 @@ int Stock::tambahBarang() {
 
 
 int Stock::pilihEditMenu() {
-    Database database;
+    while (true) {
+        menuEdit();
+        cout << "Silahkan Pilih Menu (1/2/3) : ";
+        cin >> Pilihan;
 
-    cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
-    switch (Pilihan) {
-        case 1:
-            ubahStock();
-            return kembali();
-        case 2:
-            tambahBarang();
-            return kembali();
-        case 3:
-            return 2;
-        default:
-            cout << "Input anda tidak valid\n\n";
-            break;
+        switch (Pilihan) {
+            case 1: {
+                char pilihanKembali;
+                do {
+                    ubahStock();
+                    cout << "Apakah anda ingin menambahkannya lagi (y/n)? ";
+                    cin >> pilihanKembali;
+                } while (pilihanKembali == 'y' || pilihanKembali == 'Y');
+                break;
+            }
+            case 2:
+                tambahBarang();
+                break;
+            case 3:
+                return 2;
+            default:
+                cout << "Input anda tidak valid\n\n";
+                break;
+        }
     }
-    return 1;
 }
 
 int Stock::kembali() {

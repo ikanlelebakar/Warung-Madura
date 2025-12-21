@@ -17,6 +17,7 @@ public:
     void loadFromJson(const std::string& fileName);
     void saveToJson(const std::string& fileName);
     bool updateStok(int codeBarang, int stokBaru);
+    void initDatabase(const std::string& fileName);
 };
 
 extern std::vector<Database::barang> datasetBarang;

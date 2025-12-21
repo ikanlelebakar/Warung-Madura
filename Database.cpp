@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <filesystem>
 
 using json = nlohmann::json;
 std::vector<Database::barang> datasetBarang;
@@ -73,4 +74,18 @@ void Database::tampilBarang() {
                   << std::setw(15) << barang.hargaBarang
                   << std::endl;
     }
+}
+
+void Database::initDatabase(const std::string& fileName) {
+    if (std::filesystem::exists(fileName)) {
+        return; // database sudah ada
+    }
+
+    json j;
+    j["barang"] = json::array(); // database kosong tapi valid
+
+    std::ofstream file(fileName);
+    file << j.dump(4);
+
+    std::cout << "database.json berhasil dibuat otomatis\n";
 }

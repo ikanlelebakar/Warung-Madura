@@ -2,6 +2,8 @@
 #include "Stock.h"
 #include <iostream>
 
+#include "Database.h"
+
 using namespace std;
 Kasir kasir;
 Stock stock;
@@ -19,6 +21,11 @@ void Menu() {
 }
 
 int main() {
+    Database db;
+
+    db.initDatabase("../database.json");
+    db.loadFromJson("../database.json");
+
     do {
         Menu();
         cout << "Silahkan Pilih Menu (1/2/3/4) : "; cin >> kasir.Pilihan;
