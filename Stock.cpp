@@ -1,6 +1,7 @@
 #include "Stock.h"
 #include "Database.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -27,12 +28,106 @@ void Stock::menuEdit() {
 }
 
 int Stock::ubahStock() {
+    Database database;
+    database.loadFromJson("../database.json");
+    database.tampilBarang();
 
+    int codeCari;
+    cout << "\nMasukkan Code Barang yang ingin diubah: ";
+    cin >> codeCari;
+
+    bool ditemukan = false;
+
+    for (auto& barang : datasetBarang) {
+        if (barang.codeBarang == codeCari) {
+            ditemukan = true;
+
+            cout << "\nData lama:\n";
+            cout << "Nama   : " << barang.nama << endl;
+            cout << "Code   : " << barang.codeBarang << endl;
+            cout << "Jumlah : " << barang.jumlahBarang << endl;
+
+            cout << "\nMasukkan data baru\n";
+            cout << "Nama Barang   : ";
+            cin.ignore();
+            getline(cin, barang.nama);
+
+            cout << "Code Barang   : "; cin >> barang.codeBarang;
+            cout << "Jumlah Barang : "; cin >> barang.jumlahBarang;
+
+            database.saveToJson("../database.json");
+
+            cout << "\nStock berhasil diubah\n";
+            return 1;
+        }
+    }
+    if (!ditemukan) {
+        cout << "\nBarang tidak ditemukan\n";
+    }
+    return 0;
+}
+
+string toLower(string s) {
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
+string underscoreToSpace(string s) {
+    replace(s.begin(), s.end(), '_', ' ');
+    return s;
 }
 
 int Stock::tambahBarang() {
+    Database database;
+    database.loadFromJson("../database.json");
 
+    Database::barang barangBaru;
+    string namaInput;
+
+    cout << "\nMasukkan Data Barang Baru\n";
+    cout << "Gunakan '_' untuk spasi (contoh: coca_cola)\n";
+
+    cout << "Nama Barang   : ";
+    cin.ignore();
+    getline(cin, namaInput);
+
+    namaInput = toLower(namaInput);
+    namaInput = underscoreToSpace(namaInput);
+
+    // cek nama duplikat
+    for (const auto& b : datasetBarang) {
+        if (toLower(b.nama) == namaInput) {
+            cout << "\nBarang dengan nama tersebut sudah ada.\n";
+            return 0;
+        }
+    }
+
+    barangBaru.nama = namaInput;
+
+    cout << "Jumlah Barang : ";
+    cin >> barangBaru.jumlahBarang;
+
+    cout << "Harga Barang  : ";
+    cin >> barangBaru.hargaBarang;
+
+    int maxCode = 999;
+    for (const auto& b : datasetBarang) {
+        if (b.codeBarang > maxCode) {
+            maxCode = b.codeBarang;
+        }
+    }
+    barangBaru.codeBarang = maxCode + 1;
+
+    datasetBarang.push_back(barangBaru);
+
+    database.saveToJson("../database.json");
+
+    cout << "\nBarang baru berhasil ditambahkan\n";
+    cout << "Code Barang Otomatis: " << barangBaru.codeBarang << endl;
+
+    return 1;
 }
+
 
 int Stock::pilihEditMenu() {
     Database database;
@@ -40,13 +135,11 @@ int Stock::pilihEditMenu() {
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
-            database.loadFromJson("../database.json");
-            database.tampilBarang();
-            return 1;
+            ubahStock();
+            return kembali();
         case 2:
-            database.loadFromJson("../database.json");
-            database.tampilBarang();
-            return 0;
+            tambahBarang();
+            return kembali();
         case 3:
             return 2;
         default:
@@ -73,6 +166,7 @@ int Stock::pilihMenu() {
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
+            database.loadFromJson("../database.json");
             database.tampilBarang();
             return kembali();
         case 2:

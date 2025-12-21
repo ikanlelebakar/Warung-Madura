@@ -22,6 +22,7 @@ int Kasir::menuBelanja() {
     char pilihan;
     Database database;
     database.loadFromJson("../database.json");
+    database.tampilBarang();
 
     do {
         bool ditemukan = false;
@@ -87,6 +88,7 @@ void Kasir::tampilKeranjang() {
 
 void Kasir::checkout() {
     char pilihan;
+    Database database;
 
     cout << "\n===== CHECKOUT =====\n";
     tampilKeranjang();
@@ -95,6 +97,7 @@ void Kasir::checkout() {
     cin >> pilihan;
 
     if (pilihan == 'y' || pilihan == 'Y') {
+        database.saveToJson("../database.json");
         cout << "Transaksi berhasil. Terima kasih.\n";
         keranjang.clear(); // transaksi selesai
         return;
