@@ -23,8 +23,8 @@ void Menu() {
 int main() {
     Database db;
 
-    db.initDatabase("../database.json");
-    db.loadFromJson("../database.json");
+    db.initDatabase("../Database/database.json");
+    db.loadFromJson("../Database/database.json");
 
     do {
         Menu();

@@ -30,7 +30,7 @@ void Stock::menuEdit() {
 
 int Stock::ubahStock() {
     Database database;
-    database.loadFromJson("../database.json");
+    database.loadFromJson("../Database/database.json");
     database.tampilBarang();
 
     int codeCari;
@@ -57,7 +57,7 @@ int Stock::ubahStock() {
             cout << "Jumlah Barang : "; cin >> barang.jumlahBarang;
             cout << "Harga Barang  : "; cin >> barang.hargaBarang;
 
-            database.saveToJson("../database.json");
+            database.saveToJson("../Database/database.json");
 
             cout << "\nStock berhasil diubah\n";
             return 1;
@@ -81,7 +81,7 @@ string underscoreToSpace(string s) {
 
 int Stock::tambahBarang() {
     Database database;
-    database.loadFromJson("../database.json");
+    database.loadFromJson("../Database/database.json");
 
     Database::barang barangBaru;
     string namaInput;
@@ -122,7 +122,7 @@ int Stock::tambahBarang() {
 
     datasetBarang.push_back(barangBaru);
 
-    database.saveToJson("../database.json");
+    database.saveToJson("../Database/database.json");
 
     cout << "\nBarang baru berhasil ditambahkan\n";
     cout << "Code Barang Otomatis: " << barangBaru.codeBarang << endl;
@@ -176,7 +176,7 @@ int Stock::pilihMenu() {
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
-            database.loadFromJson("../database.json");
+            database.loadFromJson("../Database/database.json");
             database.tampilBarang();
             return kembali();
         case 2:
@@ -189,4 +189,5 @@ int Stock::pilihMenu() {
             cout << "Input anda tidak valid\n\n";
             break;
     }
+    return 0;
 }
