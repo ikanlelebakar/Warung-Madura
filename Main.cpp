@@ -1,10 +1,12 @@
 #include "Kasir.h"
 #include "Stock.h"
+#include "PathHelper.h"
 #include <iostream>
 
 #include "Database.h"
 
 using namespace std;
+
 Kasir kasir;
 Stock stock;
 
@@ -22,9 +24,10 @@ void Menu() {
 
 int main() {
     Database db;
+    string dbPath = getDatabasePath();
 
-    db.initDatabase("../Database/database.json");
-    db.loadFromJson("../Database/database.json");
+    db.initDatabase(dbPath);
+    db.loadFromJson(dbPath);
 
     do {
         Menu();

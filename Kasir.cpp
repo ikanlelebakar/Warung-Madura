@@ -1,5 +1,6 @@
 #include "Kasir.h"
 #include "Database.h"
+#include "PathHelper.h"
 #include <iostream>
 #include <vector>
 #include <iomanip>
@@ -21,7 +22,7 @@ int Kasir::menuBelanja() {
     int codeBarang, jumlahBarang;
     char pilihan;
     Database database;
-    database.loadFromJson("../Database/database.json");
+    database.loadFromJson(getDatabasePath());
     database.tampilBarang();
 
     do {
@@ -101,7 +102,7 @@ void Kasir::checkout() {
     cin >> pilihan;
 
     if (pilihan == 'y' || pilihan == 'Y') {
-        database.saveToJson("../Database/database.json");
+        database.saveToJson(getDatabasePath());
         cout << "Transaksi berhasil. Terima kasih.\n";
         keranjang.clear(); // transaksi selesai
         return;

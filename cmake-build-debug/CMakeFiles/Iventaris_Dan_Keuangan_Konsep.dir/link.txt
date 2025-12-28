@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\Iventaris_Dan_Keuangan_Konsep.dir/objects.a
+C:\mingw64\bin\ar.exe qc CMakeFiles\Iventaris_Dan_Keuangan_Konsep.dir/objects.a @CMakeFiles\Iventaris_Dan_Keuangan_Konsep.dir\objects1.rsp
+C:\mingw64\bin\c++.exe -static -Wl,--whole-archive CMakeFiles\Iventaris_Dan_Keuangan_Konsep.dir/objects.a -Wl,--no-whole-archive -o Iventaris_Dan_Keuangan_Konsep.exe -Wl,--out-implib,libIventaris_Dan_Keuangan_Konsep.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Iventaris_Dan_Keuangan_Konsep.dir\linkLibs.rsp

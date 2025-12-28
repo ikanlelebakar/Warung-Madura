@@ -1,5 +1,6 @@
 #include "Stock.h"
 #include "Database.h"
+#include "PathHelper.h"
 #include <iostream>
 #include <algorithm>
 #include <iostream>
@@ -30,7 +31,7 @@ void Stock::menuEdit() {
 
 int Stock::ubahStock() {
     Database database;
-    database.loadFromJson("../Database/database.json");
+    database.loadFromJson(getDatabasePath());
     database.tampilBarang();
 
     int codeCari;
@@ -57,7 +58,7 @@ int Stock::ubahStock() {
             cout << "Jumlah Barang : "; cin >> barang.jumlahBarang;
             cout << "Harga Barang  : "; cin >> barang.hargaBarang;
 
-            database.saveToJson("../Database/database.json");
+            database.saveToJson(getDatabasePath());
 
             cout << "\nStock berhasil diubah\n";
             return 1;
@@ -81,7 +82,7 @@ string underscoreToSpace(string s) {
 
 int Stock::tambahBarang() {
     Database database;
-    database.loadFromJson("../Database/database.json");
+    database.loadFromJson(getDatabasePath());
 
     Database::barang barangBaru;
     string namaInput;
@@ -122,7 +123,7 @@ int Stock::tambahBarang() {
 
     datasetBarang.push_back(barangBaru);
 
-    database.saveToJson("../Database/database.json");
+    database.saveToJson(getDatabasePath());
 
     cout << "\nBarang baru berhasil ditambahkan\n";
     cout << "Code Barang Otomatis: " << barangBaru.codeBarang << endl;
@@ -176,7 +177,7 @@ int Stock::pilihMenu() {
     cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
-            database.loadFromJson("../Database/database.json");
+            database.loadFromJson(getDatabasePath());
             database.tampilBarang();
             return kembali();
         case 2:
