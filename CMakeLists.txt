@@ -11,6 +11,12 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+configure_file(
+        ${CMAKE_SOURCE_DIR}/Database/database.json
+        ${CMAKE_BINARY_DIR}/Database/database.json
+        COPYONLY
+)
+
 add_executable(Iventaris_Dan_Keuangan_Konsep
         Main.cpp
         Kasir.cpp

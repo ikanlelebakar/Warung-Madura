@@ -9,14 +9,14 @@
         {
             "codeBarang": 1001,
             "hargaBarang": 2000.0,
-            "jumlahBarang": 18,
+            "jumlahBarang": 7,
             "nama": "kas_sambel"
         },
         {
             "codeBarang": 1002,
-            "hargaBarang": 12300.0,
+            "hargaBarang": 12345.0,
             "jumlahBarang": 2,
-            "nama": "fish bakar amikom"
+            "nama": "fish_bakar"
         }
     ]
 }
