@@ -2,21 +2,27 @@
     "barang": [
         {
             "codeBarang": 1000,
-            "hargaBarang": 200000.0,
-            "jumlahBarang": 5,
+            "hargaBarang": 23000.0,
+            "jumlahBarang": 10,
             "nama": "ceko goreng"
         },
         {
             "codeBarang": 1001,
             "hargaBarang": 2000.0,
-            "jumlahBarang": 7,
+            "jumlahBarang": 17,
             "nama": "kas_sambel"
         },
         {
             "codeBarang": 1002,
             "hargaBarang": 12345.0,
-            "jumlahBarang": 2,
+            "jumlahBarang": 0,
             "nama": "fish_bakar"
+        },
+        {
+            "codeBarang": 1003,
+            "hargaBarang": 20000.0,
+            "jumlahBarang": 13,
+            "nama": "ayam_bakar"
         }
     ]
 }

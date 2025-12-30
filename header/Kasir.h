@@ -2,21 +2,13 @@
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #include <vector>
 
+// Struct untuk item di keranjang belanja
 struct ItemBelanja {
     int codeBarang, jumlah;
     double harga;
 };
 
-class Kasir {
-    public:
-        void menuKasir(), checkout();;
-        int pilihMenu(), Pilihan;
-
-    private:
-        int menuBelanja();
-        void tampilKeranjang();
-};
-
+// Global keranjang belanja
 extern std::vector<ItemBelanja> keranjang;
 
 #endif //IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H

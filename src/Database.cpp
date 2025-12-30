@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <iomanip>
 #include <filesystem>
 
 using json = nlohmann::json;
@@ -46,46 +45,23 @@ void Database::saveToJson(const std::string& fileName) {
     file << j.dump(4);
 }
 
-bool Database::updateStok(int codeBarang, int stokBaru) {
-    for (auto& b : datasetBarang) {
-        if (b.codeBarang == codeBarang) {
-            b.jumlahBarang = stokBaru;
-            return true;
-        }
-    }
-    return false;
-}
-
-void Database::tampilBarang() {
-    std::cout << std::left
-              << std::setw(15) << "Nama Barang"
-              << std::setw(15) << "Code Barang"
-              << std::setw(18) << "Jumlah Barang"
-              << std::setw(15) << "Harga Barang"
-              << std::endl;
-
-    std::cout << std::string(63, '-') << std::endl;
-
-    for (const auto& barang : datasetBarang) {
-        std::cout << std::left
-                  << std::setw(15) << barang.nama
-                  << std::setw(15) << barang.codeBarang
-                  << std::setw(18) << barang.jumlahBarang
-                  << std::setw(15) << barang.hargaBarang
-                  << std::endl;
-    }
-}
-
 void Database::initDatabase(const std::string& fileName) {
     if (std::filesystem::exists(fileName)) {
-        return; // database sudah ada
+        return;
     }
 
     json j;
-    j["barang"] = json::array(); // database kosong tapi valid
+    j["barang"] = json::array();
 
     std::ofstream file(fileName);
     file << j.dump(4);
 
     std::cout << "database.json berhasil dibuat otomatis\n";
+}
+
+void Database::reindexCodes() {
+    int newCode = 1000;
+    for (auto& b : datasetBarang) {
+        b.codeBarang = newCode++;
+    }
 }
