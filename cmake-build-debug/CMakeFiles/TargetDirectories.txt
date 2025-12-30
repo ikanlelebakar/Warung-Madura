@@ -1,3 +1,0 @@
-E:/Codingan/cpp project/Iventaris Dan Keuangan Konsep/cmake-build-debug/CMakeFiles/Iventaris_Dan_Keuangan_Konsep.dir
-E:/Codingan/cpp project/Iventaris Dan Keuangan Konsep/cmake-build-debug/CMakeFiles/edit_cache.dir
-E:/Codingan/cpp project/Iventaris Dan Keuangan Konsep/cmake-build-debug/CMakeFiles/rebuild_cache.dir

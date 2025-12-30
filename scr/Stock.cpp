@@ -1,9 +1,8 @@
-#include "Stock.h"
-#include "Database.h"
-#include "PathHelper.h"
+#include "../header/Stock.h"
+#include "../header/Database.h"
+#include "../header/PathHelper.h"
 #include <iostream>
 #include <algorithm>
-#include <iostream>
 
 using namespace std;
 

@@ -15,8 +15,14 @@
         {
             "codeBarang": 1002,
             "hargaBarang": 12345.0,
-            "jumlahBarang": 2,
+            "jumlahBarang": 0,
             "nama": "fish_bakar"
+        },
+        {
+            "codeBarang": 1003,
+            "hargaBarang": 1.0,
+            "jumlahBarang": 0,
+            "nama": "1"
         }
     ]
 }

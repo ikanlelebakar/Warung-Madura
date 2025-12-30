@@ -18,12 +18,12 @@ configure_file(
 )
 
 add_executable(Iventaris_Dan_Keuangan_Konsep
-        Main.cpp
-        Kasir.cpp
-        Kasir.h
-        Database.cpp
-        Database.h
-        Stock.cpp
-        Stock.h
-        PathHelper.h
+        scr/Main.cpp
+        scr/Kasir.cpp
+        scr/Database.cpp
+        scr/Stock.cpp
+        header/Kasir.h
+        header/Database.h
+        header/Stock.h
+        header/PathHelper.h
 )

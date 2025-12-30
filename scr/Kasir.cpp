@@ -1,6 +1,6 @@
-#include "Kasir.h"
-#include "Database.h"
-#include "PathHelper.h"
+#include "../header/Kasir.h"
+#include "../header/Database.h"
+#include "../header/PathHelper.h"
 #include <iostream>
 #include <vector>
 #include <iomanip>
