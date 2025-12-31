@@ -8,6 +8,8 @@
 using namespace std;
 vector<ItemBelanja> keranjang;
 
+void clearScreen();
+
 void Kasir::menuKasir() {
     cout << "\n===============================" << endl;
     cout << "SELAMAT DATANG DI MENU KASIR" << endl;
@@ -95,6 +97,8 @@ void Kasir::checkout() {
     char pilihan;
     Database database;
 
+    clearScreen();
+    
     cout << "\n===== CHECKOUT =====\n";
     tampilKeranjang();
 
@@ -123,6 +127,7 @@ int Kasir::pilihMenu() {
     cout << "Silahkan Pilih Menu (1/2) : "; cin >> Pilihan;
     switch (Pilihan) {
         case 1:
+            clearScreen();
             menuBelanja();
             return 0;
         case 2:

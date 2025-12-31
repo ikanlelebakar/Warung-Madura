@@ -4,8 +4,8 @@
 
 class Stock {
     public:
-        void menuStock(), menuEdit();
-        int pilihMenu(), kembali(), pilihEditMenu(), ubahStock(), tambahBarang(), hapusBarang();
+        void menuStock(), menuEdit(), menuSort();
+        int pilihMenu(), kembali(), pilihEditMenu(), ubahStock(), tambahBarang(), hapusBarang(), sortFunction();
     private:
         char pilihanKembali;
         int Pilihan;
