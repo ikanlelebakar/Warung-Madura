@@ -5,7 +5,7 @@
 class Stock {
     public:
         void menuStock(), menuEdit();
-        int pilihMenu(), kembali(), pilihEditMenu(), ubahStock(), tambahBarang();
+        int pilihMenu(), kembali(), pilihEditMenu(), ubahStock(), tambahBarang(), hapusBarang();
     private:
         char pilihanKembali;
         int Pilihan;

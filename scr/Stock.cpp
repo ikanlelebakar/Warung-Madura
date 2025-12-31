@@ -6,6 +6,18 @@
 
 using namespace std;
 
+void clearScreen();
+
+string toLower(string s) {
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
+string underscoreToSpace(string s) {
+    replace(s.begin(), s.end(), '_', ' ');
+    return s;
+}
+
 void Stock::menuStock() {
     cout << "\n================================" << endl;
     cout << "SELAMAT DATANG DI MENU STOCK" << endl;
@@ -24,7 +36,8 @@ void Stock::menuEdit() {
     cout << "\t\tMENU" << endl;
     cout << "1. UBAH STOCK" << endl;
     cout << "2. TAMBAH BARANG" << endl;
-    cout << "3. KEMBALI" << endl;
+    cout << "3. HAPUS BARANG" << endl;
+    cout << "4. KEMBALI" << endl;
     cout << "================================" << endl;
 }
 
@@ -49,10 +62,14 @@ int Stock::ubahStock() {
             cout << "Jumlah : " << barang.jumlahBarang << endl;
             cout << "Harga  : " << barang.hargaBarang << endl;
 
-            cout << "\nMasukkan data baru\n";
+            cout << "\nMasukkan data baru (kosongkan untuk tidak mengubah)\n";
             cout << "Nama Barang (untuk spasi gunakan '_' debagai pengganti)  : ";
             cin.ignore();
-            getline(cin, barang.nama);
+            string namaInput;
+            getline(cin, namaInput);
+            if (!namaInput.empty()) {
+                barang.nama = underscoreToSpace(toLower(namaInput));
+            }
 
             cout << "Jumlah Barang : "; cin >> barang.jumlahBarang;
             cout << "Harga Barang  : "; cin >> barang.hargaBarang;
@@ -69,15 +86,6 @@ int Stock::ubahStock() {
     return 0;
 }
 
-string toLower(string s) {
-    transform(s.begin(), s.end(), s.begin(), ::tolower);
-    return s;
-}
-
-string underscoreToSpace(string s) {
-    replace(s.begin(), s.end(), '_', ' ');
-    return s;
-}
 
 int Stock::tambahBarang() {
     Database database;
@@ -130,11 +138,67 @@ int Stock::tambahBarang() {
     return 1;
 }
 
+int Stock::hapusBarang() {
+    Database database;
+    database.loadFromJson(getDatabasePath());
+    database.tampilBarang();
+
+    if (datasetBarang.empty()) {
+        cout << "\nTidak ada barang untuk dihapus.\n";
+        return 0;
+    }
+
+    int codeCari;
+    cout << "\nMasukkan Code Barang yang ingin dihapus: ";
+    cin >> codeCari;
+
+    bool ditemukan = false;
+    int indexHapus = -1;
+
+    for (int i = 0; i < datasetBarang.size(); i++) {
+        if (datasetBarang[i].codeBarang == codeCari) {
+            ditemukan = true;
+            indexHapus = i;
+
+            cout << "\nData yang akan dihapus:\n";
+            cout << "Nama   : " << datasetBarang[i].nama << endl;
+            cout << "Code   : " << datasetBarang[i].codeBarang << endl;
+            cout << "Jumlah : " << datasetBarang[i].jumlahBarang << endl;
+            cout << "Harga  : " << datasetBarang[i].hargaBarang << endl;
+            break;
+        }
+    }
+
+    if (!ditemukan) {
+        cout << "\nBarang tidak ditemukan\n";
+        return 0;
+    }
+
+    char konfirmasi;
+    cout << "\nApakah anda yakin ingin menghapus barang ini? (y/n): ";
+    cin >> konfirmasi;
+
+    if (konfirmasi == 'y' || konfirmasi == 'Y') {
+        datasetBarang.erase(datasetBarang.begin() + indexHapus);
+
+        // Renumber kode barang mulai dari 1000
+        for (int i = 0; i < datasetBarang.size(); i++) {
+            datasetBarang[i].codeBarang = 1000 + i;
+        }
+
+        database.saveToJson(getDatabasePath());
+        cout << "\nBarang berhasil dihapus dan kode barang telah diperbarui.\n";
+        return 1;
+    } else {
+        cout << "\nPenghapusan dibatalkan.\n";
+        return 0;
+    }
+}
 
 int Stock::pilihEditMenu() {
     while (true) {
         menuEdit();
-        cout << "Silahkan Pilih Menu (1/2/3) : ";
+        cout << "Silahkan Pilih Menu (1/2/3/4) : ";
         cin >> Pilihan;
 
         switch (Pilihan) {
@@ -142,7 +206,7 @@ int Stock::pilihEditMenu() {
                 char pilihanKembali;
                 do {
                     ubahStock();
-                    cout << "Apakah anda ingin menambahkannya lagi (y/n)? ";
+                    cout << "Apakah anda ingin mengubahnya lagi (y/n)? ";
                     cin >> pilihanKembali;
                 } while (pilihanKembali == 'y' || pilihanKembali == 'Y');
                 break;
@@ -150,7 +214,16 @@ int Stock::pilihEditMenu() {
             case 2:
                 tambahBarang();
                 break;
-            case 3:
+            case 3: {
+                char pilihanKembali;
+                do {
+                    hapusBarang();
+                    cout << "Apakah anda ingin menghapus lagi (y/n)? ";
+                    cin >> pilihanKembali;
+                } while (pilihanKembali == 'y' || pilihanKembali == 'Y');
+                break;
+            }
+            case 4:
                 return 2;
             default:
                 cout << "Input anda tidak valid\n\n";
@@ -165,29 +238,37 @@ int Stock::kembali() {
         if (pilihanKembali == 'y' || pilihanKembali == 'Y') {
             return 2;
         } else {
-            return 1;
+            break;
         }
     }
+    return 0;
 }
 
 int Stock::pilihMenu() {
     Database database;
 
-    cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
-    switch (Pilihan) {
-        case 1:
-            database.loadFromJson(getDatabasePath());
-            database.tampilBarang();
-            return kembali();
-        case 2:
-            menuEdit();
-            pilihEditMenu();
-            return 0;
-        case 3:
-            return 2;
-        default:
-            cout << "Input anda tidak valid\n\n";
-            break;
+    while (true) {
+        menuStock();
+        cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
+        switch (Pilihan) {
+            case 1:
+                database.loadFromJson(getDatabasePath());
+                clearScreen();
+                database.tampilBarang();
+                return kembali();
+            case 2:
+                clearScreen();
+                if (pilihEditMenu() == 2) {
+                    clearScreen();
+                }
+                break;
+            case 3:
+                return 2;
+            default:
+                cout << "Input anda tidak valid\n\n";
+                clearScreen();
+                break;
+        }
     }
     return 0;
 }

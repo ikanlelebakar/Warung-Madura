@@ -2,9 +2,9 @@
     "barang": [
         {
             "codeBarang": 1000,
-            "hargaBarang": 200000.0,
-            "jumlahBarang": 5,
-            "nama": "ceko goreng"
+            "hargaBarang": 20000.0,
+            "jumlahBarang": 10,
+            "nama": "ayam panggang"
         },
         {
             "codeBarang": 1001,
@@ -14,15 +14,15 @@
         },
         {
             "codeBarang": 1002,
-            "hargaBarang": 12345.0,
-            "jumlahBarang": 0,
-            "nama": "fish_bakar"
+            "hargaBarang": 10000.0,
+            "jumlahBarang": 10,
+            "nama": "fais berenang"
         },
         {
             "codeBarang": 1003,
-            "hargaBarang": 1.0,
-            "jumlahBarang": 0,
-            "nama": "1"
+            "hargaBarang": 22222.0,
+            "jumlahBarang": 10,
+            "nama": "ikan tenggelam"
         }
     ]
 }
