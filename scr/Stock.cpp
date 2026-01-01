@@ -3,6 +3,7 @@
 #include "../header/PathHelper.h"
 #include <iostream>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
@@ -38,6 +39,16 @@ void Stock::menuEdit() {
     cout << "2. TAMBAH BARANG" << endl;
     cout << "3. HAPUS BARANG" << endl;
     cout << "4. KEMBALI" << endl;
+    cout << "================================" << endl;
+}
+
+void Stock::menuSort() {
+    cout << "\n================================" << endl;
+    cout << "SELAMAT DATANG DI MENU SORT STOCK" << endl;
+    cout << "================================" << endl;
+    cout << "\t\tMENU" << endl;
+    cout << "1. SORT BY JUMLAH" << endl;
+    cout << "2. KEMBALI" << endl;
     cout << "================================" << endl;
 }
 
@@ -85,7 +96,6 @@ int Stock::ubahStock() {
     }
     return 0;
 }
-
 
 int Stock::tambahBarang() {
     Database database;
@@ -197,6 +207,7 @@ int Stock::hapusBarang() {
 
 int Stock::pilihEditMenu() {
     while (true) {
+        clearScreen();
         menuEdit();
         cout << "Silahkan Pilih Menu (1/2/3/4) : ";
         cin >> Pilihan;
@@ -205,6 +216,7 @@ int Stock::pilihEditMenu() {
             case 1: {
                 char pilihanKembali;
                 do {
+                    clearScreen();
                     ubahStock();
                     cout << "Apakah anda ingin mengubahnya lagi (y/n)? ";
                     cin >> pilihanKembali;
@@ -212,11 +224,13 @@ int Stock::pilihEditMenu() {
                 break;
             }
             case 2:
+                clearScreen();
                 tambahBarang();
                 break;
             case 3: {
                 char pilihanKembali;
                 do {
+                    clearScreen();
                     hapusBarang();
                     cout << "Apakah anda ingin menghapus lagi (y/n)? ";
                     cin >> pilihanKembali;
@@ -224,6 +238,60 @@ int Stock::pilihEditMenu() {
                 break;
             }
             case 4:
+                return 2;
+            default:
+                cout << "Input anda tidak valid\n\n";
+                break;
+        }
+    }
+}
+
+int Stock::sortFunction() {
+    Database database;
+    database.loadFromJson(getDatabasePath());
+    
+    while (true) {
+        database.tampilBarang();
+        menuSort();
+        cout << "Silahkan Pilih Menu (1/2) : "; cin >> Pilihan;
+        switch (Pilihan) {
+            case 1: {
+                // Buat salinan data untuk sorting (tidak mengubah data asli)
+                vector<Database::barang> sortedData = datasetBarang;
+                
+                // Sort berdasarkan jumlahBarang (ascending: 0 ke n)
+                sort(sortedData.begin(), sortedData.end(), 
+                    [](const Database::barang& a, const Database::barang& b) {
+                        return a.jumlahBarang < b.jumlahBarang;
+                    });
+                
+                // Tampilkan hasil sorting
+                clearScreen();
+                cout << "\n=========================================" << endl;
+                cout << "  DAFTAR BARANG (SORTED BY JUMLAH BARANG)  " << endl;
+                cout << "=========================================" << endl;
+                cout << left << setw(6) << "CODE" 
+                     << setw(20) << "NAMA" 
+                     << setw(10) << "JUMLAH" 
+                     << setw(12) << "HARGA" << endl;
+                cout << "-----------------------------------------" << endl;
+                
+                for (const auto& b : sortedData) {
+                    cout << left << setw(6) << b.codeBarang
+                         << setw(20) << b.nama
+                         << setw(10) << b.jumlahBarang
+                         << setw(12) << fixed << setprecision(0) << b.hargaBarang << endl;
+                }
+                
+                cout << "=========================================" << endl;
+                cout << "\nTekan Enter untuk kembali...";
+                cin.ignore();
+                cin.get();
+                clearScreen();
+                break;
+            }
+            case 2:
+                clearScreen();
                 return 2;
             default:
                 cout << "Input anda tidak valid\n\n";
@@ -245,17 +313,14 @@ int Stock::kembali() {
 }
 
 int Stock::pilihMenu() {
-    Database database;
-
     while (true) {
         menuStock();
         cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
         switch (Pilihan) {
             case 1:
-                database.loadFromJson(getDatabasePath());
                 clearScreen();
-                database.tampilBarang();
-                return kembali();
+                sortFunction();
+                break;
             case 2:
                 clearScreen();
                 if (pilihEditMenu() == 2) {

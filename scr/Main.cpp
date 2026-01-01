@@ -39,6 +39,7 @@ int main() {
     db.loadFromJson(dbPath);
 
     do {
+        clearScreen();
         Menu();
         cout << "Silahkan Pilih Menu (1/2/3/4) : "; cin >> kasir.Pilihan;
         switch (kasir.Pilihan) {

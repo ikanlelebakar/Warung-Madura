@@ -3,26 +3,26 @@
         {
             "codeBarang": 1000,
             "hargaBarang": 20000.0,
-            "jumlahBarang": 10,
+            "jumlahBarang": 8,
             "nama": "ayam panggang"
         },
         {
             "codeBarang": 1001,
-            "hargaBarang": 2000.0,
-            "jumlahBarang": 7,
-            "nama": "kas_sambel"
-        },
-        {
-            "codeBarang": 1002,
             "hargaBarang": 10000.0,
-            "jumlahBarang": 10,
+            "jumlahBarang": 5,
             "nama": "fais berenang"
         },
         {
-            "codeBarang": 1003,
+            "codeBarang": 1002,
             "hargaBarang": 22222.0,
             "jumlahBarang": 10,
             "nama": "ikan tenggelam"
+        },
+        {
+            "codeBarang": 1003,
+            "hargaBarang": 200000.0,
+            "jumlahBarang": 10,
+            "nama": "vestia zeta"
         }
     ]
 }
