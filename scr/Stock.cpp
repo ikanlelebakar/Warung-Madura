@@ -142,8 +142,22 @@ int Stock::tambahBarang() {
 
     database.saveToJson(getDatabasePath());
 
+    // Simpan sebagai pengeluaran (pembelian stok)
+    Database::Transaksi trans;
+    trans.id = generateTransactionId();
+    trans.tanggal = getCurrentDate();
+    trans.waktu = getCurrentTime();
+    trans.jenis = "pengeluaran";
+    trans.keterangan = "Pembelian stok: " + barangBaru.nama;
+    trans.jumlah = barangBaru.hargaBarang * barangBaru.jumlahBarang;
+    
+    database.loadTransaksi(getTransaksiPath());
+    database.tambahTransaksi(trans);
+    database.saveTransaksi(getTransaksiPath());
+
     cout << "\nBarang baru berhasil ditambahkan\n";
     cout << "Code Barang Otomatis: " << barangBaru.codeBarang << endl;
+    cout << "Pengeluaran tercatat: Rp " << trans.jumlah << endl;
 
     return 1;
 }

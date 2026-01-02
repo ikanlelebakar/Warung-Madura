@@ -102,11 +102,31 @@ void Kasir::checkout() {
     cout << "\n===== CHECKOUT =====\n";
     tampilKeranjang();
 
+    // Hitung total harga
+    double totalHarga = 0;
+    for (const auto &item : keranjang) {
+        totalHarga += item.harga * item.jumlah;
+    }
+
     cout << "\nKonfirmasi transaksi? (y = bayar / n = batal): ";
     cin >> pilihan;
 
     if (pilihan == 'y' || pilihan == 'Y') {
         database.saveToJson(getDatabasePath());
+        
+        // Simpan transaksi sebagai pemasukan
+        Database::Transaksi trans;
+        trans.id = generateTransactionId();
+        trans.tanggal = getCurrentDate();
+        trans.waktu = getCurrentTime();
+        trans.jenis = "pemasukan";
+        trans.keterangan = "Penjualan barang";
+        trans.jumlah = totalHarga;
+        
+        database.loadTransaksi(getTransaksiPath());
+        database.tambahTransaksi(trans);
+        database.saveTransaksi(getTransaksiPath());
+        
         cout << "Transaksi berhasil. Terima kasih.\n";
         keranjang.clear(); // transaksi selesai
         return;

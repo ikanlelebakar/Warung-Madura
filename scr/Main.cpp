@@ -2,6 +2,7 @@
 #include "../header/Stock.h"
 #include "../header/PathHelper.h"
 #include "../header/Database.h"
+#include "../header/Keuangan.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -9,6 +10,7 @@ using namespace std;
 
 Kasir kasir;
 Stock stock;
+Keuangan keuangan;
 
 // Function untuk membersihkan layar terminal
 void clearScreen() {
@@ -34,9 +36,15 @@ void Menu() {
 int main() {
     Database db;
     string dbPath = getDatabasePath();
+    string transPath = getTransaksiPath();
 
+    // Initialize databases
     db.initDatabase(dbPath);
+    db.initTransaksi(transPath);
+    
+    // Load databases
     db.loadFromJson(dbPath);
+    db.loadTransaksi(transPath);
 
     do {
         clearScreen();
@@ -58,6 +66,8 @@ int main() {
                 clearScreen();
                 break;
             case 3:
+                clearScreen();
+                keuangan.pilihMenu();
                 clearScreen();
                 break;
             case 4:
