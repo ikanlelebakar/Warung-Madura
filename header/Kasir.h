@@ -1,6 +1,7 @@
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #include <vector>
+#include <string>
 
 struct ItemBelanja {
     int codeBarang, jumlah;
@@ -9,12 +10,14 @@ struct ItemBelanja {
 
 class Kasir {
     public:
-        void menuKasir(), checkout();;
+        void menuKasir(), checkout(), printNota();
         int pilihMenu(), Pilihan;
-
+        
     private:
-        int menuBelanja();
+        std::string menuPrintNota();
+        int menuBelanja(), pilihanMetode;
         void tampilKeranjang();
+        char print;
 };
 
 extern std::vector<ItemBelanja> keranjang;

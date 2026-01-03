@@ -40,12 +40,13 @@ double Keuangan::hitungLabaBersih() {
 // ==================== DISPLAY FUNCTIONS ====================
 
 // Konstanta untuk lebar tabel (konsisten di seluruh output)
-const int TABLE_WIDTH = 70;
+const int TABLE_WIDTH = 80;
 const int COL_NO = 4;
 const int COL_TANGGAL = 12;
 const int COL_WAKTU = 10;
-const int COL_KETERANGAN = 28;
+const int COL_KETERANGAN = 25;
 const int COL_JUMLAH = 14;
+const int COL_METODE = 10;  // Untuk kolom metode pembayaran
 
 // Helper function untuk membuat garis separator
 void printSeparator(char c = '-') {
@@ -113,6 +114,7 @@ void Keuangan::tampilRincianPemasukan() {
              << setw(COL_TANGGAL) << "Tanggal"
              << setw(COL_WAKTU) << "Waktu"
              << setw(COL_KETERANGAN) << "Keterangan"
+             << setw(COL_METODE) << "Metode"
              << right << setw(COL_JUMLAH) << "Jumlah (Rp)" << endl;
         printSeparator('-');
         
@@ -126,11 +128,18 @@ void Keuangan::tampilRincianPemasukan() {
                 ket = ket.substr(0, COL_KETERANGAN - 5) + "...";
             }
             
+            // Potong metodePembayaran jika terlalu panjang
+            string metode = t.metodePembayaran;
+            if (metode.length() > COL_METODE - 2) {
+                metode = metode.substr(0, COL_METODE - 3) + ".";
+            }
+            
             cout << left
                  << " " << setw(COL_NO) << no++
                  << setw(COL_TANGGAL) << t.tanggal
                  << setw(COL_WAKTU) << t.waktu
                  << setw(COL_KETERANGAN) << ket
+                 << setw(COL_METODE) << metode
                  << right << setw(COL_JUMLAH) << fixed << setprecision(0) << t.jumlah << endl;
             total += t.jumlah;
         }

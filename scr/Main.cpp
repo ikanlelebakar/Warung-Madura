@@ -53,11 +53,7 @@ int main() {
         switch (kasir.Pilihan) {
             case 1:
                 clearScreen();
-                kasir.menuKasir();
-                if (kasir.pilihMenu() == 2) {
-                    clearScreen();
-                    break;
-                }
+                kasir.pilihMenu();
                 clearScreen();
                 break;
             case 2:

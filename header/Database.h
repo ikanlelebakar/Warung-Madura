@@ -19,6 +19,7 @@ public:
         std::string jenis;        // "pemasukan" atau "pengeluaran"
         std::string keterangan;   // Deskripsi transaksi
         double jumlah;            // Nominal transaksi
+        std::string metodePembayaran;  // "cash" atau "cashless"
     };
 
     // Barang functions

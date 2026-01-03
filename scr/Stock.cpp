@@ -148,7 +148,7 @@ int Stock::tambahBarang() {
     trans.tanggal = getCurrentDate();
     trans.waktu = getCurrentTime();
     trans.jenis = "pengeluaran";
-    trans.keterangan = "Pembelian stok: " + barangBaru.nama;
+    trans.keterangan = barangBaru.nama;
     trans.jumlah = barangBaru.hargaBarang * barangBaru.jumlahBarang;
     
     database.loadTransaksi(getTransaksiPath());

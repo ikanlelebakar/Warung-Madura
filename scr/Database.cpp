@@ -114,6 +114,12 @@ void Database::loadTransaksi(const std::string& fileName) {
             t.jenis = item["jenis"];
             t.keterangan = item["keterangan"];
             t.jumlah = item["jumlah"];
+            // Backward compatibility: old data may not have metodePembayaran
+            if (item.contains("metodePembayaran")) {
+                t.metodePembayaran = item["metodePembayaran"];
+            } else {
+                t.metodePembayaran = "tidak diketahui";
+            }
             datasetTransaksi.push_back(t);
         }
     }
@@ -130,7 +136,8 @@ void Database::saveTransaksi(const std::string& fileName) {
             {"waktu", t.waktu},
             {"jenis", t.jenis},
             {"keterangan", t.keterangan},
-            {"jumlah", t.jumlah}
+            {"jumlah", t.jumlah},
+            {"metodePembayaran", t.metodePembayaran}
         });
     }
 
