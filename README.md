@@ -82,8 +82,6 @@ make
 Warung-Madura/
 ├── CMakeLists.txt      # Konfigurasi CMake
 ├── README.md           # Dokumentasi project
-├── Database/           # File database JSON
-│   └── database.json
 ├── header/             # Header files (.h)
 │   ├── Database.h
 │   ├── Kasir.h
