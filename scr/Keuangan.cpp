@@ -1,3 +1,14 @@
+/**
+ * ============================================================
+ * MODUL KEUANGAN - Sistem Pencatatan Warung Madura
+ * ============================================================
+ * File        : Keuangan.cpp
+ * Deskripsi   : Modul untuk mengelola dan menampilkan laporan
+ *               keuangan termasuk pemasukan, pengeluaran,
+ *               dan export ke CSV
+ * ============================================================
+ */
+
 #include "../header/Keuangan.h"
 #include "../header/Database.h"
 #include "../header/PathHelper.h"
@@ -6,13 +17,83 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
+// Deklarasi fungsi eksternal dari Main.cpp
 void clearScreen();
 
-// ==================== FINANCIAL CALCULATION FUNCTIONS ====================
+// ============================================================
+// KONSTANTA UNTUK FORMAT TABEL
+// ============================================================
 
+// Lebar tabel dan kolom (konsisten di seluruh output)
+const int TABLE_WIDTH = 80;
+const int COL_NO = 4;
+const int COL_TANGGAL = 12;
+const int COL_WAKTU = 10;
+const int COL_KETERANGAN = 25;
+const int COL_JUMLAH = 14;
+const int COL_METODE = 10;      // Kolom metode pembayaran
+
+// Lebar menu keuangan
+const int KEUANGAN_MENU_WIDTH = 40;
+
+// ============================================================
+// FUNGSI HELPER KEUANGAN
+// ============================================================
+
+/**
+ * Fungsi untuk memberikan delay singkat
+ * @param ms - durasi dalam milidetik
+ */
+void keuanganDelay(int ms) {
+    this_thread::sleep_for(chrono::milliseconds(ms));
+}
+
+/**
+ * Fungsi untuk mencetak garis separator tabel
+ * @param c - karakter yang digunakan (default: '-')
+ */
+void printSeparator(char c = '-') {
+    cout << string(TABLE_WIDTH, c) << endl;
+}
+
+/**
+ * Fungsi untuk mencetak header terpusat dalam tabel
+ * @param text - teks yang akan di-center
+ */
+void printCenteredHeader(const string& text) {
+    int padding = (TABLE_WIDTH - text.length()) / 2;
+    cout << string(padding, ' ') << text << endl;
+}
+
+/**
+ * Fungsi untuk mencetak separator menu keuangan
+ */
+void printKeuanganSeparator(char c = '=') {
+    cout << string(KEUANGAN_MENU_WIDTH, c) << endl;
+}
+
+/**
+ * Fungsi untuk mencetak teks terpusat di menu keuangan
+ */
+void printKeuanganCenter(const string& text) {
+    int padding = (KEUANGAN_MENU_WIDTH - text.length()) / 2;
+    cout << string(padding, ' ') << text << endl;
+}
+
+// ============================================================
+// FUNGSI PERHITUNGAN KEUANGAN
+// ============================================================
+
+/**
+ * Fungsi untuk menghitung total pemasukan
+ * Menjumlahkan semua transaksi dengan jenis "pemasukan"
+ * @return double - total pemasukan
+ */
 double Keuangan::hitungTotalPemasukan() {
     double total = 0;
     for (const auto& t : datasetTransaksi) {
@@ -23,6 +104,11 @@ double Keuangan::hitungTotalPemasukan() {
     return total;
 }
 
+/**
+ * Fungsi untuk menghitung total pengeluaran
+ * Menjumlahkan semua transaksi dengan jenis "pengeluaran"
+ * @return double - total pengeluaran
+ */
 double Keuangan::hitungTotalPengeluaran() {
     double total = 0;
     for (const auto& t : datasetTransaksi) {
@@ -33,32 +119,23 @@ double Keuangan::hitungTotalPengeluaran() {
     return total;
 }
 
+/**
+ * Fungsi untuk menghitung laba bersih
+ * Laba = Total Pemasukan - Total Pengeluaran
+ * @return double - laba bersih (bisa negatif jika rugi)
+ */
 double Keuangan::hitungLabaBersih() {
     return hitungTotalPemasukan() - hitungTotalPengeluaran();
 }
 
-// ==================== DISPLAY FUNCTIONS ====================
+// ============================================================
+// FUNGSI TAMPILAN RINGKASAN KEUANGAN
+// ============================================================
 
-// Konstanta untuk lebar tabel (konsisten di seluruh output)
-const int TABLE_WIDTH = 80;
-const int COL_NO = 4;
-const int COL_TANGGAL = 12;
-const int COL_WAKTU = 10;
-const int COL_KETERANGAN = 25;
-const int COL_JUMLAH = 14;
-const int COL_METODE = 10;  // Untuk kolom metode pembayaran
-
-// Helper function untuk membuat garis separator
-void printSeparator(char c = '-') {
-    cout << string(TABLE_WIDTH, c) << endl;
-}
-
-// Helper function untuk membuat header terpusat
-void printCenteredHeader(const string& text) {
-    int padding = (TABLE_WIDTH - text.length()) / 2;
-    cout << string(padding, ' ') << text << endl;
-}
-
+/**
+ * Fungsi untuk menampilkan ringkasan keuangan
+ * Menampilkan total pemasukan, pengeluaran, dan laba bersih
+ */
 void Keuangan::tampilRingkasanKeuangan() {
     double pemasukan = hitungTotalPemasukan();
     double pengeluaran = hitungTotalPengeluaran();
@@ -69,6 +146,7 @@ void Keuangan::tampilRingkasanKeuangan() {
     printCenteredHeader("RINGKASAN KEUANGAN");
     printSeparator('=');
     
+    // Tampilkan data dengan format rupiah
     cout << fixed << setprecision(0);
     cout << "  " << left << setw(30) << "Total Pemasukan" 
          << ": Rp " << right << setw(15) << pemasukan << endl;
@@ -80,8 +158,17 @@ void Keuangan::tampilRingkasanKeuangan() {
     printSeparator('=');
 }
 
+// ============================================================
+// FUNGSI TAMPILAN RINCIAN PEMASUKAN
+// ============================================================
+
+/**
+ * Fungsi untuk menampilkan rincian transaksi pemasukan
+ * Data diurutkan berdasarkan tanggal dan waktu (terbaru di atas)
+ * Menampilkan kolom metode pembayaran
+ */
 void Keuangan::tampilRincianPemasukan() {
-    // Filter dan copy hanya transaksi pemasukan
+    // Filter hanya transaksi pemasukan
     vector<Database::Transaksi> pemasukan;
     for (const auto& t : datasetTransaksi) {
         if (t.jenis == "pemasukan") {
@@ -90,14 +177,15 @@ void Keuangan::tampilRincianPemasukan() {
     }
     
     // Sort descending by date+time (terbaru di atas)
+    // Konversi format DD-MM-YYYY ke YYYYMMDD untuk sorting yang benar
     sort(pemasukan.begin(), pemasukan.end(),
         [](const Database::Transaksi& a, const Database::Transaksi& b) {
-            // DD-MM-YYYY format, convert to YYYYMMDD for proper sorting
             string dateA = a.tanggal.substr(6,4) + a.tanggal.substr(3,2) + a.tanggal.substr(0,2) + a.waktu;
             string dateB = b.tanggal.substr(6,4) + b.tanggal.substr(3,2) + b.tanggal.substr(0,2) + b.waktu;
             return dateA > dateB;
         });
     
+    // Header tabel
     cout << endl;
     printSeparator('=');
     printCenteredHeader("RINCIAN PEMASUKAN");
@@ -108,7 +196,7 @@ void Keuangan::tampilRincianPemasukan() {
     if (pemasukan.empty()) {
         cout << "  Belum ada transaksi pemasukan." << endl;
     } else {
-        // Header tabel
+        // Header kolom tabel
         cout << left 
              << " " << setw(COL_NO) << "No"
              << setw(COL_TANGGAL) << "Tanggal"
@@ -118,7 +206,7 @@ void Keuangan::tampilRincianPemasukan() {
              << right << setw(COL_JUMLAH) << "Jumlah (Rp)" << endl;
         printSeparator('-');
         
-        // Data rows dengan nomor urut
+        // Data rows
         int no = 1;
         double total = 0;
         for (const auto& t : pemasukan) {
@@ -156,8 +244,16 @@ void Keuangan::tampilRincianPemasukan() {
     cin.get();
 }
 
+// ============================================================
+// FUNGSI TAMPILAN RINCIAN PENGELUARAN
+// ============================================================
+
+/**
+ * Fungsi untuk menampilkan rincian transaksi pengeluaran
+ * Data diurutkan berdasarkan tanggal dan waktu (terbaru di atas)
+ */
 void Keuangan::tampilRincianPengeluaran() {
-    // Filter dan copy hanya transaksi pengeluaran
+    // Filter hanya transaksi pengeluaran
     vector<Database::Transaksi> pengeluaran;
     for (const auto& t : datasetTransaksi) {
         if (t.jenis == "pengeluaran") {
@@ -168,12 +264,12 @@ void Keuangan::tampilRincianPengeluaran() {
     // Sort descending by date+time (terbaru di atas)
     sort(pengeluaran.begin(), pengeluaran.end(),
         [](const Database::Transaksi& a, const Database::Transaksi& b) {
-            // DD-MM-YYYY format, convert to YYYYMMDD for proper sorting
             string dateA = a.tanggal.substr(6,4) + a.tanggal.substr(3,2) + a.tanggal.substr(0,2) + a.waktu;
             string dateB = b.tanggal.substr(6,4) + b.tanggal.substr(3,2) + b.tanggal.substr(0,2) + b.waktu;
             return dateA > dateB;
         });
     
+    // Header tabel
     cout << endl;
     printSeparator('=');
     printCenteredHeader("RINCIAN PENGELUARAN");
@@ -184,7 +280,7 @@ void Keuangan::tampilRincianPengeluaran() {
     if (pengeluaran.empty()) {
         cout << "  Belum ada transaksi pengeluaran." << endl;
     } else {
-        // Header tabel
+        // Header kolom tabel (tanpa kolom metode untuk pengeluaran)
         cout << left 
              << " " << setw(COL_NO) << "No"
              << setw(COL_TANGGAL) << "Tanggal"
@@ -193,7 +289,7 @@ void Keuangan::tampilRincianPengeluaran() {
              << right << setw(COL_JUMLAH) << "Jumlah (Rp)" << endl;
         printSeparator('-');
         
-        // Data rows dengan nomor urut
+        // Data rows
         int no = 1;
         double total = 0;
         for (const auto& t : pengeluaran) {
@@ -224,35 +320,44 @@ void Keuangan::tampilRincianPengeluaran() {
     cin.get();
 }
 
-// ==================== EXPORT FUNCTION ====================
+// ============================================================
+// FUNGSI EXPORT KE CSV
+// ============================================================
 
+/**
+ * Fungsi untuk mengexport laporan keuangan ke file CSV
+ * File akan disimpan di folder Documents user
+ * Nama file: Laporan_Keuangan_YYYY_MM.csv
+ */
 void Keuangan::exportToCSV() {
-    // Generate filename: Laporan_Keuangan_YYYY_MM.csv
+    // Generate nama file dengan format: Laporan_Keuangan_YYYY_MM.csv
     string fileName = "Laporan_Keuangan_" + getCurrentMonthYear() + ".csv";
     string fullPath = getDocumentsPath() + "\\" + fileName;
     
+    // Buka file untuk ditulis
     ofstream file(fullPath);
     
     if (!file.is_open()) {
-        cout << "\nError: Tidak dapat membuat file CSV.\n";
-        cout << "Path: " << fullPath << endl;
+        cout << "\n  [!] Error: Tidak dapat membuat file CSV." << endl;
+        cout << "  Path: " << fullPath << endl;
         return;
     }
     
-    // Header CSV
-    file << "ID,Tanggal,Waktu,Jenis,Keterangan,Jumlah" << endl;
+    // Tulis header CSV
+    file << "ID,Tanggal,Waktu,Jenis,Keterangan,Jumlah,MetodePembayaran" << endl;
     
-    // Data rows
+    // Tulis data transaksi
     for (const auto& t : datasetTransaksi) {
         file << t.id << ","
              << t.tanggal << ","
              << t.waktu << ","
              << t.jenis << ","
              << "\"" << t.keterangan << "\","
-             << fixed << setprecision(0) << t.jumlah << endl;
+             << fixed << setprecision(0) << t.jumlah << ","
+             << t.metodePembayaran << endl;
     }
     
-    // Summary at the end
+    // Tulis ringkasan di bagian akhir
     file << endl;
     file << "=== RINGKASAN ===" << endl;
     file << "Total Pemasukan,,,," << hitungTotalPemasukan() << endl;
@@ -261,94 +366,134 @@ void Keuangan::exportToCSV() {
     
     file.close();
     
-    cout << "\n========================================" << endl;
-    cout << "Export berhasil!" << endl;
-    cout << "File: " << fileName << endl;
-    cout << "Lokasi: " << fullPath << endl;
-    cout << "========================================" << endl;
-    cout << "\nTekan Enter untuk kembali...";
+    // Tampilkan konfirmasi
+    cout << endl;
+    printSeparator('=');
+    printCenteredHeader("EXPORT BERHASIL!");
+    printSeparator('=');
+    cout << "  File   : " << fileName << endl;
+    cout << "  Lokasi : " << fullPath << endl;
+    printSeparator('=');
+    cout << "\n  Tekan Enter untuk kembali...";
     cin.ignore();
     cin.get();
 }
 
-// ==================== MENU FUNCTIONS ====================
+// ============================================================
+// FUNGSI TAMPILAN MENU
+// ============================================================
 
+/**
+ * Fungsi untuk menampilkan menu utama keuangan
+ */
 void Keuangan::menuKeuangan() {
-    cout << "\n===============================" << endl;
-    cout << "SELAMAT DATANG DI MENU KEUANGAN" << endl;
-    cout << "===============================" << endl;
-    cout << "\t\tMENU" << endl;
-    cout << "1. LAPORAN KEUANGAN" << endl;
-    cout << "2. EXPORT LAPORAN KEUANGAN KE CSV" << endl;
-    cout << "3. KEMBALI" << endl;
-    cout << "===============================" << endl;
+    cout << endl;
+    printKeuanganSeparator('=');
+    printKeuanganCenter("MENU KEUANGAN");
+    printKeuanganSeparator('=');
+    printKeuanganCenter("M E N U");
+    printKeuanganSeparator('-');
+    cout << "  1. LAPORAN KEUANGAN" << endl;
+    cout << "  2. EXPORT KE CSV" << endl;
+    cout << "  3. KEMBALI KE MENU UTAMA" << endl;
+    printKeuanganSeparator('=');
 }
 
+/**
+ * Fungsi untuk menampilkan menu laporan keuangan
+ * Menampilkan ringkasan keuangan di atas menu
+ */
 void Keuangan::menuLaporan() {
-    // Tampilkan ringkasan di atas menu
+    // Tampilkan ringkasan terlebih dahulu
     tampilRingkasanKeuangan();
     
-    cout << "\n===============================" << endl;
-    cout << "MENU LAPORAN KEUANGAN" << endl;
-    cout << "===============================" << endl;
-    cout << "1. RINCIAN PENGELUARAN" << endl;
-    cout << "2. RINCIAN PEMASUKAN" << endl;
-    cout << "3. KEMBALI" << endl;
-    cout << "===============================" << endl;
+    cout << endl;
+    printKeuanganSeparator('=');
+    printKeuanganCenter("MENU LAPORAN");
+    printKeuanganSeparator('=');
+    cout << "  1. RINCIAN PENGELUARAN" << endl;
+    cout << "  2. RINCIAN PEMASUKAN" << endl;
+    cout << "  3. KEMBALI" << endl;
+    printKeuanganSeparator('=');
 }
 
+// ============================================================
+// FUNGSI PILIH MENU LAPORAN
+// ============================================================
+
+/**
+ * Fungsi untuk menangani pilihan menu laporan
+ * @return int - status (0 = kembali)
+ */
 int Keuangan::pilihLaporan() {
     Database db;
     
     while (true) {
         clearScreen();
         
-        // Load transaksi data
+        // Load data transaksi terbaru
         db.loadTransaksi(getTransaksiPath());
         
         menuLaporan();
-        cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
+        cout << "  Silahkan Pilih Menu (1/2/3): ";
+        cin >> Pilihan;
+        
         switch (Pilihan) {
-        case 1:
-            clearScreen();
-            tampilRincianPengeluaran();
-            break;
-        case 2:
-            clearScreen();
-            tampilRincianPemasukan();
-            break;
-        case 3:
-            return 0; // Kembali ke pilihMenu()
-        default:
-            cout << "Input anda tidak valid\n\n";
-            break;
+            case 1:
+                clearScreen();
+                tampilRincianPengeluaran();
+                break;
+            case 2:
+                clearScreen();
+                tampilRincianPemasukan();
+                break;
+            case 3:
+                return 0; // Kembali ke menu keuangan
+            default:
+                cout << "\n  Input tidak valid!" << endl;
+                keuanganDelay(1500);
+                break;
         }
     }   
 }
 
+// ============================================================
+// FUNGSI PILIH MENU KEUANGAN (UTAMA)
+// ============================================================
+
+/**
+ * Fungsi utama untuk menangani menu keuangan
+ * @return int - status (0 = kembali ke menu utama)
+ */
 int Keuangan::pilihMenu() {
     Database db;
     
     while (true) {
         clearScreen();
         
-        // Load transaksi data
+        // Load data transaksi terbaru
         db.loadTransaksi(getTransaksiPath());
         
         menuKeuangan();
-        cout << "Silahkan Pilih Menu (1/2/3) : "; cin >> Pilihan;
+        cout << "  Silahkan Pilih Menu (1/2/3): ";
+        cin >> Pilihan;
+        
         switch (Pilihan) {
             case 1:
+                // Masuk ke menu laporan
                 pilihLaporan();
                 break;
             case 2:
+                // Export ke CSV
                 clearScreen();
                 exportToCSV();
                 break;
             case 3:
-                return 0; // Kembali ke main menu
+                // Kembali ke menu utama
+                return 0;
             default:
-                cout << "Input anda tidak valid\n\n";
+                cout << "\n  Input tidak valid!" << endl;
+                keuanganDelay(1500);
                 break;
         }
     }
