@@ -95,10 +95,10 @@ void Kasir::tampilKeranjang() {
     
     // Header kolom
     cout << left
-         << setw(12) << "Nama Barang"
-         << setw(12) << "Jumlah"
-         << setw(15) << "Harga"
-         << setw(15) << "Subtotal"
+         << setw(17) << "Nama Barang"
+         << setw(14) << "Jumlah"
+         << setw(12) << "Harga"
+         << setw(10) << "Subtotal"
          << endl;
     
     cout << string(54, '-') << endl;
@@ -109,16 +109,16 @@ void Kasir::tampilKeranjang() {
         total += subtotal;
         
         cout << left
-             << setw(12) << item.namaBarang
-             << setw(12) << item.jumlah
-             << setw(15) << fixed << setprecision(0) << item.harga
-             << setw(15) << subtotal
+             << setw(20) << item.namaBarang
+             << setw(11) << item.jumlah
+             << setw(13) << fixed << setprecision(0) << item.harga
+             << setw(11) << subtotal
              << endl;
     }
     
     // Footer dengan total harga
     cout << string(54, '-') << endl;
-    cout << right << setw(39) << "TOTAL HARGA: Rp " 
+    cout << right << setw(44) << "TOTAL HARGA: Rp " 
          << fixed << setprecision(0) << total << endl;
     cout << string(54, '=') << endl;
 }
