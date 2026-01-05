@@ -95,7 +95,7 @@ void Kasir::tampilKeranjang() {
     
     // Header kolom
     cout << left
-         << setw(12) << "Code"
+         << setw(12) << "Nama Barang"
          << setw(12) << "Jumlah"
          << setw(15) << "Harga"
          << setw(15) << "Subtotal"
@@ -109,7 +109,7 @@ void Kasir::tampilKeranjang() {
         total += subtotal;
         
         cout << left
-             << setw(12) << item.codeBarang
+             << setw(12) << item.namaBarang
              << setw(12) << item.jumlah
              << setw(15) << fixed << setprecision(0) << item.harga
              << setw(15) << subtotal
@@ -333,7 +333,7 @@ int Kasir::menuBelanja() {
                 }
                 
                 // Tambahkan ke keranjang dan kurangi stok
-                keranjang.push_back({codeBarang, jumlahBarang, barang.hargaBarang});
+                keranjang.push_back({barang.nama, barang.codeBarang, jumlahBarang, barang.hargaBarang});
                 barang.jumlahBarang -= jumlahBarang;
                 cout << "  [v] Barang berhasil ditambahkan ke keranjang" << endl;
                 break;

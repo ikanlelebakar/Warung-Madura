@@ -4,6 +4,7 @@
 #include <string>
 
 struct ItemBelanja {
+    std::string namaBarang;
     int codeBarang, jumlah;
     double harga;
 };
