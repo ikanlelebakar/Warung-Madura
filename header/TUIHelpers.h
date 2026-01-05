@@ -18,6 +18,28 @@ std::vector<std::vector<std::string>> getCartTableData();
 // Get total belanja di keranjang
 double getCartTotal();
 
+// ============================================================
+// KEUANGAN FUNCTIONS
+// ============================================================
+
+// Hitung total pemasukan
+double hitungTotalPemasukan();
+
+// Hitung total pengeluaran
+double hitungTotalPengeluaran();
+
+// Hitung laba bersih
+double hitungLabaBersih();
+
+// Get data transaksi pemasukan untuk tabel
+std::vector<std::vector<std::string>> getPemasukanTableData();
+
+// Get data transaksi pengeluaran untuk tabel
+std::vector<std::vector<std::string>> getPengeluaranTableData();
+
+// Export transaksi ke CSV
+std::string exportToCSV();
+
 }
 
 #endif //IVENTARIS_DAN_KEUANGAN_KONSEP_TUI_HELPERS_H

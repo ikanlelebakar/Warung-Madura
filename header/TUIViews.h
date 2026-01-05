@@ -18,9 +18,15 @@ ftxui::Element RenderCheckout(const std::vector<std::string>& cartHeaders);
 ftxui::Element RenderStockMenu(ftxui::Component& menu, const std::vector<std::string>& stockHeaders);
 ftxui::Element RenderStockAdd(ftxui::Component& namaInput, ftxui::Component& jumlahInput, ftxui::Component& hargaInput, const std::vector<std::string>& stockHeaders);
 ftxui::Element RenderStockEdit(ftxui::Component& codeInput, ftxui::Component& namaInput, ftxui::Component& jumlahInput, ftxui::Component& hargaInput, const std::vector<std::string>& stockHeaders);
-ftxui::Element RenderKeuangan();
 ftxui::Element RenderStockDelete(ftxui::Component& codeInput, const std::vector<std::string>& stockHeaders);
 ftxui::Element RenderDeleteConfirm(const std::string& itemName, int itemCode);
+
+// Keuangan views
+ftxui::Element RenderKeuanganMenu(ftxui::Component& menu);
+ftxui::Element RenderKeuanganRingkasan();
+ftxui::Element RenderKeuanganPemasukan(const std::vector<std::string>& headers);
+ftxui::Element RenderKeuanganPengeluaran(const std::vector<std::string>& headers);
+ftxui::Element RenderKeuanganExportResult(const std::string& filePath);
 
 }
 

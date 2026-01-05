@@ -1,5 +1,6 @@
 #include "TUIViews.h"
 #include "Kasir.h"
+#include "Database.h"
 
 using namespace ftxui;
 
@@ -86,14 +87,6 @@ Element RenderStockEdit(Component& codeInput, Component& namaInput, Component& j
     });
 }
 
-Element RenderKeuangan() {
-    return StyledBox(vbox({
-        text("COMING SOON") | bold | center | color(Colors::accent()), separator(),
-        text("Fitur laporan keuangan dalam pengembangan") | center | dim,
-        text("[Enter/Esc] Kembali") | center | dim
-    }), "KEUANGAN") | center;
-}
-
 Element RenderStockDelete(Component& codeInput, const std::vector<std::string>& stockHeaders) {
     return hbox({
         StyledBox(vbox({
@@ -111,6 +104,122 @@ Element RenderDeleteConfirm(const std::string& itemName, int itemCode) {
         hbox({text("Kode  : ") | bold, text(std::to_string(itemCode))}) | center,
         separator(), text("Tekan [Y] untuk Hapus | [N] untuk Batal") | center | color(Colors::danger())
     }), "KONFIRMASI HAPUS") | center | color(Colors::danger());
+}
+
+// ============================================================
+// KEUANGAN VIEWS
+// ============================================================
+
+Element RenderKeuanganMenu(Component& menu) {
+    // Ringkasan keuangan di sebelah kiri, menu di sebelah kanan
+    double pemasukan = hitungTotalPemasukan();
+    double pengeluaran = hitungTotalPengeluaran();
+    double laba = hitungLabaBersih();
+    
+    auto ringkasanBox = StyledBox(vbox({
+        text("") | size(HEIGHT, EQUAL, 1),
+        hbox({text("Total Pemasukan   : ") | bold, text(formatRupiah(pemasukan)) | color(Colors::success())}) | center,
+        hbox({text("Total Pengeluaran : ") | bold, text(formatRupiah(pengeluaran)) | color(Colors::danger())}) | center,
+        separator(),
+        hbox({text("LABA BERSIH       : ") | bold, text(formatRupiah(laba)) | bold | color(laba >= 0 ? Colors::success() : Colors::danger())}) | center,
+        text("") | size(HEIGHT, EQUAL, 1),
+    }), "RINGKASAN KEUANGAN");
+    
+    return hbox({
+        StyledBox(menu->Render(), "Menu Keuangan") | size(WIDTH, EQUAL, 30),
+        ringkasanBox | flex
+    });
+}
+
+Element RenderKeuanganRingkasan() {
+    double pemasukan = hitungTotalPemasukan();
+    double pengeluaran = hitungTotalPengeluaran();
+    double laba = hitungLabaBersih();
+    
+    return StyledBox(vbox({
+        text("") | size(HEIGHT, EQUAL, 1),
+        text("RINGKASAN KEUANGAN") | bold | center | color(Colors::primary()),
+        text("") | size(HEIGHT, EQUAL, 1),
+        separator(),
+        text("") | size(HEIGHT, EQUAL, 1),
+        hbox({text("Total Pemasukan   : "), text(formatRupiah(pemasukan)) | color(Colors::success())}) | center,
+        hbox({text("Total Pengeluaran : "), text(formatRupiah(pengeluaran)) | color(Colors::danger())}) | center,
+        separator(),
+        hbox({text("LABA BERSIH       : ") | bold, text(formatRupiah(laba)) | bold | color(laba >= 0 ? Colors::success() : Colors::danger())}) | center,
+        text("") | size(HEIGHT, EQUAL, 1),
+        separator(),
+        text("[Esc] Kembali") | center | dim,
+        text("") | size(HEIGHT, EQUAL, 1),
+    }), "LAPORAN KEUANGAN") | center;
+}
+
+Element RenderKeuanganPemasukan(const std::vector<std::string>& headers) {
+    auto data = getPemasukanTableData();
+    
+    if (data.empty()) {
+        return StyledBox(vbox({
+            text("Belum ada transaksi pemasukan") | center | dim,
+            separator(),
+            text("[Esc] Kembali") | center | dim
+        }), "RINCIAN PEMASUKAN") | center;
+    }
+    
+    double total = hitungTotalPemasukan();
+    
+    return StyledBox(vbox({
+        text("Total transaksi: " + std::to_string(data.size())) | dim,
+        separator(),
+        StyledTable(data, headers) | frame | flex,
+        separator(),
+        hbox({text("TOTAL: ") | bold, text(formatRupiah(total)) | bold | color(Colors::success())}) | center,
+        separator(),
+        text("[Esc] Kembali") | center | dim
+    }), "RINCIAN PEMASUKAN") | flex;
+}
+
+Element RenderKeuanganPengeluaran(const std::vector<std::string>& headers) {
+    auto data = getPengeluaranTableData();
+    
+    if (data.empty()) {
+        return StyledBox(vbox({
+            text("Belum ada transaksi pengeluaran") | center | dim,
+            separator(),
+            text("[Esc] Kembali") | center | dim
+        }), "RINCIAN PENGELUARAN") | center;
+    }
+    
+    double total = hitungTotalPengeluaran();
+    
+    return StyledBox(vbox({
+        text("Total transaksi: " + std::to_string(data.size())) | dim,
+        separator(),
+        StyledTable(data, headers) | frame | flex,
+        separator(),
+        hbox({text("TOTAL: ") | bold, text(formatRupiah(total)) | bold | color(Colors::danger())}) | center,
+        separator(),
+        text("[Esc] Kembali") | center | dim
+    }), "RINCIAN PENGELUARAN") | flex;
+}
+
+Element RenderKeuanganExportResult(const std::string& filePath) {
+    if (filePath.empty()) {
+        return StyledBox(vbox({
+            text("GAGAL!") | bold | center | color(Colors::danger()),
+            separator(),
+            text("Tidak dapat membuat file CSV") | center,
+            separator(),
+            text("[Esc] Kembali") | center | dim
+        }), "EXPORT CSV") | center;
+    }
+    
+    return StyledBox(vbox({
+        text("BERHASIL!") | bold | center | color(Colors::success()),
+        separator(),
+        text("File CSV berhasil dibuat:") | center,
+        text(filePath) | center | dim,
+        separator(),
+        text("[Esc] Kembali") | center | dim
+    }), "EXPORT CSV") | center;
 }
 
 } // namespace TUI

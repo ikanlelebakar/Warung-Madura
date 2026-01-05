@@ -1,30 +1,19 @@
 # Warung Madura - Sistem Inventaris dan Keuangan
 
-Aplikasi console untuk manajemen inventaris dan keuangan warung, dibuat dengan C++ dan CMake.
+Aplikasi Text User Interface (TUI) untuk manajemen inventaris dan keuangan warung, dibuat dengan C++ dan FTXUI.
 
 ## 📋 Requirements
 
-- **CMake** versi 4.0 atau lebih baru
+- **CMake** versi 3.14 atau lebih baru
 - **C++ Compiler** dengan dukungan C++17 (MinGW, GCC, atau MSVC)
 - **Git** untuk clone repository
 
 ## 📦 Clone Repository
 
-### Branch Main (CLI Version)
-
-```bash
-git clone -b main https://github.com/ikanlelebakar/Warung-Madura.git
-cd Warung-Madura
-```
-
-### Branch TUI (Text User Interface Version) (Udah Gak Update)
-
 ```bash
 git clone -b TUI https://github.com/ikanlelebakar/Warung-Madura.git
 cd Warung-Madura
 ```
-
-> **Note:** Branch `main` berisi versi CLI standar, sedangkan branch `TUI` menggunakan library FTXUI untuk tampilan Text User Interface yang lebih interaktif.
 
 ## 🔧 Build dengan CMake
 
@@ -35,36 +24,21 @@ mkdir build
 cd build
 ```
 
-### 2. Generate build files
+### 2. Generate dan compile
 
 **Windows (MinGW):**
 ```bash
 cmake -G "MinGW Makefiles" ..
-```
-
-**Windows (Visual Studio):**
-```bash
-cmake -G "Visual Studio 17 2022" ..
+cmake --build .
 ```
 
 **Linux/macOS:**
 ```bash
 cmake ..
-```
-
-### 3. Compile project
-
-**MinGW/Linux/macOS:**
-```bash
 cmake --build .
 ```
 
-**Atau menggunakan make langsung:**
-```bash
-make
-```
-
-### 4. Jalankan program
+### 3. Jalankan program
 
 **Windows:**
 ```bash
@@ -85,16 +59,29 @@ Warung-Madura/
 ├── header/             # Header files (.h)
 │   ├── Database.h
 │   ├── Kasir.h
-│   ├── Stock.h
-│   └── PathHelper.h
-├── scr/                # Source files (.cpp)
+│   ├── PathHelper.h
+│   ├── TUI.h
+│   ├── TUIComponents.h
+│   ├── TUIHelpers.h
+│   └── TUIViews.h
+├── src/                # Source files (.cpp)
 │   ├── Main.cpp
 │   ├── Database.cpp
 │   ├── Kasir.cpp
-│   └── Stock.cpp
-├── include/            # External libraries
+│   ├── TUI.cpp
+│   ├── TUIComponents.cpp
+│   ├── TUIHelpers.cpp
+│   └── TUIViews.cpp
+├── include/            # External libraries (json.hpp)
+├── Database/           # Data files (database.json, transaksi.json)
 └── build/              # Build output (generated)
 ```
+
+## ✨ Fitur
+
+- **KASIR** - Proses belanja, keranjang, checkout
+- **STOCK** - Tambah, edit, hapus barang
+- **KEUANGAN** - Laporan pemasukan/pengeluaran, export CSV
 
 ## 📝 License
 

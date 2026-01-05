@@ -16,12 +16,23 @@ namespace TUI {
 void Run() {
     Database db;
     std::string dbPath = getDatabasePath();
+    std::string transaksiPath = getTransaksiPath();
     db.initDatabase(dbPath);
+    db.initTransaksi(transaksiPath);
     db.loadFromJson(dbPath);
+    db.loadTransaksi(transaksiPath);
     
     auto screen = ScreenInteractive::Fullscreen();
-    int viewState = 0, mainMenuSelected = 0, kasirMenuSelected = 0, stockMenuSelected = 0;
+    
+    // View states:
+    // 0 = Main Menu
+    // 1 = Kasir Menu, 2 = Kasir Belanja, 3 = Checkout
+    // 4 = Stock Menu, 5 = Stock Add, 6 = Stock Edit, 8 = Stock Delete, 9 = Delete Confirm
+    // 7 = Keuangan Menu, 10 = Keuangan Ringkasan, 11 = Pemasukan, 12 = Pengeluaran, 13 = Export Result
+    int viewState = 0;
+    int mainMenuSelected = 0, kasirMenuSelected = 0, stockMenuSelected = 0, keuanganMenuSelected = 0;
     std::string statusMsg = "Selamat datang! Gunakan Arrow Keys dan Enter.";
+    std::string exportPath = "";
     
     std::string kasirCode, kasirJumlah, stockNama, stockJumlah, stockHarga;
     std::string editCode, editNama, editJumlah, editHarga, deleteCode, deleteItemName;
@@ -30,12 +41,16 @@ void Run() {
     std::vector<std::string> mainMenuEntries = {"1. KASIR", "2. STOCK", "3. KEUANGAN", "4. KELUAR"};
     std::vector<std::string> kasirMenuEntries = {"1. Mulai Belanja", "2. Checkout", "3. Kembali"};
     std::vector<std::string> stockMenuEntries = {"1. Tambah Barang", "2. Edit Stock", "3. Hapus Barang", "4. Kembali"};
+    std::vector<std::string> keuanganMenuEntries = {"1. Ringkasan Keuangan", "2. Rincian Pemasukan", "3. Rincian Pengeluaran", "4. Export ke CSV", "5. Kembali"};
     std::vector<std::string> stockHeaders = {"Nama", "Kode", "Stock", "Harga"};
     std::vector<std::string> cartHeaders = {"Nama", "Kode", "Qty", "Harga", "Subtotal"};
+    std::vector<std::string> pemasukanHeaders = {"Tanggal", "Waktu", "Keterangan", "Metode", "Jumlah"};
+    std::vector<std::string> pengeluaranHeaders = {"Tanggal", "Waktu", "Keterangan", "Jumlah"};
     
     auto mainMenu = Menu(&mainMenuEntries, &mainMenuSelected);
     auto kasirMenu = Menu(&kasirMenuEntries, &kasirMenuSelected);
     auto stockMenu = Menu(&stockMenuEntries, &stockMenuSelected);
+    auto keuanganMenu = Menu(&keuanganMenuEntries, &keuanganMenuSelected);
     
     auto kasirCodeInput = Input(&kasirCode, "Kode barang");
     auto kasirJumlahInput = Input(&kasirJumlah, "Jumlah");
@@ -49,12 +64,20 @@ void Run() {
     auto deleteCodeInput = Input(&deleteCode, "Kode barang");
     
     auto container = Container::Tab({
-        mainMenu, kasirMenu, Container::Vertical({kasirCodeInput, kasirJumlahInput}),
-        Renderer([]{return text("");}), stockMenu,
-        Container::Vertical({stockNamaInput, stockJumlahInput, stockHargaInput}),
-        Container::Vertical({editCodeInput, editNamaInput, editJumlahInput, editHargaInput}),
-        Renderer([]{return text("");}), Container::Vertical({deleteCodeInput}),
-        Renderer([]{return text("");})
+        mainMenu,                                                           // 0
+        kasirMenu,                                                          // 1
+        Container::Vertical({kasirCodeInput, kasirJumlahInput}),           // 2
+        Renderer([]{return text("");}),                                     // 3
+        stockMenu,                                                          // 4
+        Container::Vertical({stockNamaInput, stockJumlahInput, stockHargaInput}), // 5
+        Container::Vertical({editCodeInput, editNamaInput, editJumlahInput, editHargaInput}), // 6
+        keuanganMenu,                                                       // 7
+        Container::Vertical({deleteCodeInput}),                             // 8
+        Renderer([]{return text("");}),                                     // 9
+        Renderer([]{return text("");}),                                     // 10
+        Renderer([]{return text("");}),                                     // 11
+        Renderer([]{return text("");}),                                     // 12
+        Renderer([]{return text("");}),                                     // 13
     }, &viewState);
     
     auto component = Renderer(container, [&]() {
@@ -69,9 +92,13 @@ void Run() {
             case 4: content.push_back(RenderStockMenu(stockMenu, stockHeaders)); break;
             case 5: content.push_back(RenderStockAdd(stockNamaInput, stockJumlahInput, stockHargaInput, stockHeaders)); break;
             case 6: content.push_back(RenderStockEdit(editCodeInput, editNamaInput, editJumlahInput, editHargaInput, stockHeaders)); break;
-            case 7: content.push_back(filler()); content.push_back(RenderKeuangan()); content.push_back(filler()); break;
+            case 7: content.push_back(RenderKeuanganMenu(keuanganMenu)); break;
             case 8: content.push_back(RenderStockDelete(deleteCodeInput, stockHeaders)); break;
             case 9: content.push_back(filler()); content.push_back(RenderDeleteConfirm(deleteItemName, deleteItemCode)); content.push_back(filler()); break;
+            case 10: content.push_back(filler()); content.push_back(RenderKeuanganRingkasan()); content.push_back(filler()); break;
+            case 11: content.push_back(RenderKeuanganPemasukan(pemasukanHeaders)); break;
+            case 12: content.push_back(RenderKeuanganPengeluaran(pengeluaranHeaders)); break;
+            case 13: content.push_back(filler()); content.push_back(RenderKeuanganExportResult(exportPath)); content.push_back(filler()); break;
         }
         content.push_back(StatusBar(statusMsg));
         return vbox(content) | flex;
@@ -84,9 +111,28 @@ void Run() {
             if (viewState == 5) { viewState = 4; stockNama = stockJumlah = stockHarga = ""; statusMsg = "Kembali ke menu stock"; return true; }
             if (viewState == 6) { viewState = 4; editCode = editNama = editJumlah = editHarga = ""; statusMsg = "Kembali ke menu stock"; return true; }
             if (viewState == 8 || viewState == 9) { viewState = 4; deleteCode = deleteItemName = ""; deleteItemCode = 0; statusMsg = "Kembali ke menu stock"; return true; }
+            if (viewState == 10 || viewState == 11 || viewState == 12 || viewState == 13) { viewState = 7; exportPath = ""; statusMsg = "Kembali ke menu keuangan"; return true; }
         }
         if (viewState == 3) {
-            if (event == Event::Character('y') || event == Event::Character('Y')) { db.saveToJson(dbPath); keranjang.clear(); viewState = 1; statusMsg = "Transaksi berhasil!"; return true; }
+            if (event == Event::Character('y') || event == Event::Character('Y')) {
+                // Simpan transaksi pemasukan
+                double total = getCartTotal();
+                Database::Transaksi trans;
+                trans.id = generateTransactionId();
+                trans.tanggal = getCurrentDate();
+                trans.waktu = getCurrentTime();
+                trans.jenis = "pemasukan";
+                trans.keterangan = "Penjualan barang";
+                trans.jumlah = total;
+                trans.metodePembayaran = "cash";
+                db.tambahTransaksi(trans);
+                db.saveTransaksi(transaksiPath);
+                db.saveToJson(dbPath);
+                keranjang.clear();
+                viewState = 1;
+                statusMsg = "Transaksi berhasil!";
+                return true;
+            }
             if (event == Event::Character('n') || event == Event::Character('N')) {
                 for (const auto& item : keranjang) for (auto& b : datasetBarang) if (b.codeBarang == item.codeBarang) { b.jumlahBarang += item.jumlah; break; }
                 keranjang.clear(); viewState = 1; statusMsg = "Transaksi dibatalkan."; return true;
@@ -105,7 +151,8 @@ void Run() {
         if (event == Event::Return) {
             if (viewState == 0) {
                 if (mainMenuSelected == 0) viewState = 1; else if (mainMenuSelected == 1) viewState = 4;
-                else if (mainMenuSelected == 2) viewState = 7; else if (mainMenuSelected == 3) screen.Exit();
+                else if (mainMenuSelected == 2) { viewState = 7; db.loadTransaksi(transaksiPath); }
+                else if (mainMenuSelected == 3) screen.Exit();
                 statusMsg = mainMenuSelected == 0 ? "Menu Kasir" : mainMenuSelected == 1 ? "Menu Stock" : "Menu Keuangan"; return true;
             }
             if (viewState == 1) {
@@ -119,7 +166,7 @@ void Run() {
                     int code = std::stoi(kasirCode), jumlah = std::stoi(kasirJumlah); bool found = false;
                     for (auto& b : datasetBarang) if (b.codeBarang == code) { found = true;
                         if (jumlah > b.jumlahBarang) statusMsg = "Stock tidak cukup!";
-                        else { keranjang.push_back({code, jumlah, b.hargaBarang}); b.jumlahBarang -= jumlah; statusMsg = b.nama + " ditambahkan!"; kasirCode = kasirJumlah = ""; }
+                        else { keranjang.push_back({b.nama, code, jumlah, b.hargaBarang}); b.jumlahBarang -= jumlah; statusMsg = b.nama + " ditambahkan!"; kasirCode = kasirJumlah = ""; }
                         break; }
                     if (!found) statusMsg = "Tidak ditemukan!";
                 } catch (...) { statusMsg = "Input tidak valid!"; }
@@ -150,7 +197,15 @@ void Run() {
                 } catch (...) { statusMsg = "Input tidak valid!"; }
                 return true;
             }
-            if (viewState == 7) { viewState = 0; statusMsg = "Kembali"; return true; }
+            if (viewState == 7) {
+                db.loadTransaksi(transaksiPath); // Reload transaksi setiap kali masuk submenu
+                if (keuanganMenuSelected == 0) { viewState = 10; statusMsg = "Ringkasan Keuangan"; }
+                else if (keuanganMenuSelected == 1) { viewState = 11; statusMsg = "Rincian Pemasukan"; }
+                else if (keuanganMenuSelected == 2) { viewState = 12; statusMsg = "Rincian Pengeluaran"; }
+                else if (keuanganMenuSelected == 3) { exportPath = exportToCSV(); viewState = 13; statusMsg = exportPath.empty() ? "Export gagal!" : "Export berhasil!"; }
+                else if (keuanganMenuSelected == 4) { viewState = 0; statusMsg = "Kembali"; }
+                return true;
+            }
             if (viewState == 8 && !deleteCode.empty()) {
                 try {
                     int code = std::stoi(deleteCode); bool found = false;
@@ -158,6 +213,9 @@ void Run() {
                     if (!found) statusMsg = "Tidak ditemukan!";
                 } catch (...) { statusMsg = "Input tidak valid!"; }
                 return true;
+            }
+            if (viewState == 10 || viewState == 11 || viewState == 12 || viewState == 13) {
+                viewState = 7; exportPath = ""; statusMsg = "Kembali"; return true;
             }
         }
         return false;
