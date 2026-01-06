@@ -10,7 +10,8 @@ public:
     struct barang {
         std::string nama;
         int codeBarang, jumlahBarang;
-        double hargaBarang;
+        double hargaBarang;   // Harga BELI (modal/pengeluaran)
+        double hargaJual;     // Harga JUAL (ke pelanggan, sudah termasuk markup)
     };
 
     struct Transaksi {

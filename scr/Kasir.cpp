@@ -333,8 +333,9 @@ int Kasir::menuBelanja() {
                     break;
                 }
                 
-                // Tambahkan ke keranjang dan kurangi stok
-                keranjang.push_back({barang.nama, barang.codeBarang, jumlahBarang, barang.hargaBarang});
+                // Tambahkan ke keranjang dengan HARGA JUAL (sudah termasuk markup)
+                // Pemasukan akan dicatat berdasarkan harga jual ini
+                keranjang.push_back({barang.nama, barang.codeBarang, jumlahBarang, barang.hargaJual});
                 barang.jumlahBarang -= jumlahBarang;
                 cout << "  [v] Barang berhasil ditambahkan ke keranjang" << endl;
                 break;

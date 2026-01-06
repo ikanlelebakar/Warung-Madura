@@ -10,6 +10,7 @@
 
 // === HEADER MODUL INTERNAL ===
 #include "../header/Database.h"   // Deklarasi class Database, struct barang dan Transaksi
+#include "../header/PathHelper.h" // hitungHargaJual() untuk backward compatibility
 
 // === EXTERNAL LIBRARY ===
 #include "json.hpp"  // nlohmann/json - library untuk parsing dan membuat JSON
@@ -68,12 +69,21 @@ void Database::loadFromJson(const std::string& fileName) {
 
     // Loop setiap item barang dalam JSON dan tambahkan ke dataset
     for (const auto& item : j["barang"]) {
-        datasetBarang.push_back({
-            item["nama"],           // Nama barang
-            item["codeBarang"],     // Code unik barang
-            item["jumlahBarang"],   // Jumlah stok
-            item["hargaBarang"]     // Harga satuan
-        });
+        Database::barang b;
+        b.nama = item["nama"];
+        b.codeBarang = item["codeBarang"];
+        b.jumlahBarang = item["jumlahBarang"];
+        b.hargaBarang = item["hargaBarang"];
+        
+        // Backward compatibility: jika hargaJual tidak ada di JSON lama,
+        // hitung otomatis menggunakan fungsi markup
+        if (item.contains("hargaJual")) {
+            b.hargaJual = item["hargaJual"];
+        } else {
+            b.hargaJual = hitungHargaJual(b.hargaBarang);
+        }
+        
+        datasetBarang.push_back(b);
     }
 }
 
@@ -91,7 +101,8 @@ void Database::saveToJson(const std::string& fileName) {
             {"nama", b.nama},
             {"codeBarang", b.codeBarang},
             {"jumlahBarang", b.jumlahBarang},
-            {"hargaBarang", b.hargaBarang}
+            {"hargaBarang", b.hargaBarang},
+            {"hargaJual", b.hargaJual}  // Field baru untuk harga jual
         });
     }
 
@@ -126,26 +137,28 @@ bool Database::updateStok(int codeBarang, int stokBaru) {
 
 /**
  * Fungsi untuk menampilkan daftar barang dalam format tabel
- * Menampilkan: Nama, Code, Jumlah, dan Harga
+ * Menampilkan: Nama, Code, Jumlah, Harga Beli, dan Harga Jual
  */
 void Database::tampilBarang() {
     // Header kolom
     std::cout << std::left
-              << std::setw(15) << "Nama Barang"
-              << std::setw(15) << "Code Barang"
-              << std::setw(18) << "Jumlah Barang"
-              << std::setw(15) << "Harga Barang"
+              << std::setw(15) << "Nama"
+              << std::setw(8) << "Code"
+              << std::setw(8) << "Stok"
+              << std::setw(12) << "Harga Beli"
+              << std::setw(12) << "Harga Jual"
               << std::endl;
 
-    std::cout << std::string(63, '-') << std::endl;
+    std::cout << std::string(55, '-') << std::endl;
 
     // Data rows
     for (const auto& barang : datasetBarang) {
         std::cout << std::left
                   << std::setw(15) << barang.nama
-                  << std::setw(15) << barang.codeBarang
-                  << std::setw(18) << barang.jumlahBarang
-                  << std::setw(15) << std::fixed << std::setprecision(0) << barang.hargaBarang
+                  << std::setw(8) << barang.codeBarang
+                  << std::setw(8) << barang.jumlahBarang
+                  << std::setw(12) << std::fixed << std::setprecision(0) << barang.hargaBarang
+                  << std::setw(12) << std::fixed << std::setprecision(0) << barang.hargaJual
                   << std::endl;
     }
 }

@@ -244,5 +244,25 @@ inline double getValidDouble(const std::string& prompt) {
     }
 }
 
-#endif //IVENTARIS_DAN_KEUANGAN_KONSEP_PATHHELPER_H
+// ============================================================
+// FUNGSI PERHITUNGAN HARGA JUAL (MARKUP)
+// ============================================================
 
+/**
+ * Fungsi untuk menghitung harga jual berdasarkan harga beli (modal)
+ * Markup otomatis:
+ * - Harga beli >= 10.000 → markup +2.000
+ * - Harga beli < 10.000  → markup +1.000
+ * 
+ * @param hargaBeli - harga beli/modal barang
+ * @return double - harga jual setelah markup
+ */
+inline double hitungHargaJual(double hargaBeli) {
+    if (hargaBeli >= 10000) {
+        return hargaBeli + 2000;  // Markup Rp 2.000 untuk barang >= 10rb
+    } else {
+        return hargaBeli + 1000;  // Markup Rp 1.000 untuk barang < 10rb
+    }
+}
+
+#endif //IVENTARIS_DAN_KEUANGAN_KONSEP_PATHHELPER_H

@@ -273,9 +273,12 @@ int Stock::tambahBarang() {
     cout << "  Jumlah Barang: ";
     barangBaru.jumlahBarang = getValidInt("");
 
-    // Input harga barang
-    cout << "  Harga Barang : ";
+    // Input harga barang (harga beli/modal)
+    cout << "  Harga Beli   : ";
     barangBaru.hargaBarang = getValidDouble("");
+    
+    // Hitung harga jual otomatis dengan markup
+    barangBaru.hargaJual = hitungHargaJual(barangBaru.hargaBarang);
 
     // Generate code barang otomatis (code terakhir + 1)
     int maxCode = 999;
@@ -309,8 +312,11 @@ int Stock::tambahBarang() {
     cout << endl;
     printStockSeparator('-');
     cout << "  [v] Barang baru berhasil ditambahkan!" << endl;
-    cout << "  Code Barang: " << barangBaru.codeBarang << endl;
-    cout << "  Pengeluaran: Rp " << fixed << setprecision(0) << trans.jumlah << endl;
+    cout << "  Code Barang : " << barangBaru.codeBarang << endl;
+    cout << "  Harga Beli  : Rp " << fixed << setprecision(0) << barangBaru.hargaBarang << endl;
+    cout << "  Harga Jual  : Rp " << fixed << setprecision(0) << barangBaru.hargaJual << endl;
+    cout << "  Markup      : Rp " << fixed << setprecision(0) << (barangBaru.hargaJual - barangBaru.hargaBarang) << endl;
+    cout << "  Pengeluaran : Rp " << fixed << setprecision(0) << trans.jumlah << endl;
     printStockSeparator('=');
 
     return 1;
