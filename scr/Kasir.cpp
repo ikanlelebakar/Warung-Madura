@@ -298,13 +298,13 @@ int Kasir::menuBelanja() {
     database.loadFromJson(getDatabasePath());
     
     cout << endl;
-    cout << string(63, '=') << endl;
-    cout << "            DAFTAR BARANG TERSEDIA" << endl;
-    cout << string(63, '=') << endl;
+    cout << string(55, '=') << endl;
+    cout << "          DAFTAR BARANG TERSEDIA" << endl;
+    cout << string(55, '=') << endl;
     
     // Tampilkan daftar barang yang tersedia
     database.tampilBarang();
-    cout << string(63, '-') << endl;
+    cout << string(55, '=') << endl;
 
     // Loop untuk menambahkan barang ke keranjang
     do {

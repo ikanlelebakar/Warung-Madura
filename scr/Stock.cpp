@@ -238,8 +238,8 @@ int Stock::tambahBarang() {
     printStockSeparator('-');
 
     // Input nama barang
+    // NOTE: Tidak perlu cin.ignore() karena buffer sudah bersih dari getValidIntInput()
     cout << "  Nama Barang (0 untuk kembali): ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, namaInput);
 
     // Jika user input 0, kembali ke menu edit
