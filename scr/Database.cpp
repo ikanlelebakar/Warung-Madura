@@ -8,15 +8,20 @@
  * ============================================================
  */
 
-#include "../header/Database.h"
-#include "json.hpp"
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <iomanip>
-#include <filesystem>
-#include <chrono>
-#include <sstream>
+// === HEADER MODUL INTERNAL ===
+#include "../header/Database.h"   // Deklarasi class Database, struct barang dan Transaksi
+
+// === EXTERNAL LIBRARY ===
+#include "json.hpp"  // nlohmann/json - library untuk parsing dan membuat JSON
+
+// === STANDARD LIBRARY ===
+#include <iostream>    // cout untuk menampilkan pesan error/sukses
+#include <fstream>     // ifstream/ofstream untuk membaca/menulis file JSON
+#include <vector>      // vector untuk datasetBarang dan datasetTransaksi
+#include <iomanip>     // setw, setprecision untuk format tampilan tabel barang
+#include <filesystem>  // std::filesystem::exists untuk cek keberadaan file database
+#include <chrono>      // (cadangan) untuk operasi waktu jika diperlukan
+#include <sstream>     // stringstream untuk format string (jika diperlukan)
 
 // Menggunakan alias untuk library JSON (nlohmann/json)
 using json = nlohmann::json;

@@ -8,14 +8,18 @@
  * ============================================================
  */
 
-#include "../header/Kasir.h"
-#include "../header/Database.h"
-#include "../header/PathHelper.h"
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <thread>
-#include <chrono>
+// === HEADER MODUL INTERNAL ===
+#include "../header/Kasir.h"      // Deklarasi class Kasir, struct ItemBelanja, variabel keranjang
+#include "../header/Database.h"   // Akses datasetBarang untuk operasi stok dan transaksi
+#include "../header/PathHelper.h" // Fungsi path database, validasi input (getValidInt, getValidIntInput)
+
+// === STANDARD LIBRARY ===
+#include <iostream>  // Input/output: cout untuk menampilkan menu, cin untuk input user
+#include <vector>    // Container vector<ItemBelanja> untuk menyimpan keranjang belanja
+#include <iomanip>   // Manipulator format: setw, setprecision, fixed untuk tabel rapi
+#include <thread>    // std::this_thread::sleep_for untuk kasirDelay()
+#include <chrono>    // std::chrono::milliseconds untuk durasi delay
+#include <limits>    // numeric_limits<streamsize>::max() untuk cin.ignore buffer
 
 using namespace std;
 
@@ -143,18 +147,15 @@ string Kasir::menuPrintNota() {
         cout << "  2. CASHLESS (Non-Tunai)" << endl;
         printKasirSeparator('=');
         cout << "  Pilih metode (1/2): ";
-        cin >> pilihanMetode;
+        pilihanMetode = getValidIntInput("", 1, 2);
         
         switch (pilihanMetode) {
             case 1:
                 return "CASH";
             case 2:
                 return "CASHLESS";
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                cout << "  Silakan pilih 1 atau 2." << endl;
-                kasirDelay(1500);
-                break;
+            // NOTE: default case tidak diperlukan karena validasi
+            // sudah dilakukan oleh getValidIntInput()
         }
     }
 }
@@ -197,7 +198,6 @@ void Kasir::printNota() {
     // Tanya user apakah ingin mencetak atau hanya simpan
     cout << "\n  Pilihan (p = print nota / s = simpan saja): ";
     cin >> print;
-    cin.ignore();
     
     // Simpan perubahan stok barang ke database
     database.saveToJson(getDatabasePath());
@@ -226,6 +226,7 @@ void Kasir::printNota() {
     }
     cout << "  Transaksi berhasil disimpan." << endl;
     cout << "\n  Tekan Enter untuk kembali...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin.get();
 }
 
@@ -273,7 +274,7 @@ void Kasir::checkout() {
         cout << "\n  Transaksi dibatalkan." << endl;
         cout << "  Stok barang telah dikembalikan." << endl;
         cout << "\n  Tekan Enter untuk kembali...";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin.get();
     }
 }
@@ -310,7 +311,7 @@ int Kasir::menuBelanja() {
         bool ditemukan = false;
 
         cout << "\n  Input Code Barang (0 untuk kembali): ";
-        cin >> codeBarang;
+        codeBarang = getValidInt("");
 
         // Jika user input 0, kembali ke menu sebelumnya
         if (codeBarang == 0) {
@@ -323,7 +324,7 @@ int Kasir::menuBelanja() {
                 ditemukan = true;
 
                 cout << "  Masukkan jumlah barang: ";
-                cin >> jumlahBarang;
+                jumlahBarang = getValidInt("");
 
                 // Cek apakah stok mencukupi
                 if (jumlahBarang > barang.jumlahBarang) {
@@ -374,7 +375,7 @@ int Kasir::pilihMenu() {
         menuKasir();
         
         cout << "  Silahkan Pilih Menu (1/2): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 2);
         
         switch (Pilihan) {
             case 1:
@@ -386,12 +387,8 @@ int Kasir::pilihMenu() {
             case 2:
                 // Kembali ke menu utama
                 return 2;
-                
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                cout << "  Silakan pilih 1 atau 2." << endl;
-                kasirDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }
     

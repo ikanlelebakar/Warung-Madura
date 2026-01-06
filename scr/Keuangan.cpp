@@ -9,16 +9,19 @@
  * ============================================================
  */
 
-#include "../header/Keuangan.h"
-#include "../header/Database.h"
-#include "../header/PathHelper.h"
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
-#include <fstream>
-#include <vector>
-#include <thread>
-#include <chrono>
+// === HEADER MODUL INTERNAL ===
+#include "../header/Keuangan.h"   // Deklarasi class Keuangan untuk laporan dan export
+#include "../header/Database.h"   // Akses datasetTransaksi untuk data pemasukan/pengeluaran
+#include "../header/PathHelper.h" // Path transaksi, getDocumentsPath untuk export CSV, validasi input
+
+// === STANDARD LIBRARY ===
+#include <iostream>   // Input/output: cout untuk tampilan laporan
+#include <iomanip>    // Manipulator format: setw, setprecision untuk format tabel keuangan
+#include <algorithm>  // sort() untuk mengurutkan transaksi berdasarkan tanggal
+#include <fstream>    // ofstream untuk menulis file CSV export
+#include <vector>     // vector<Transaksi> untuk menyimpan filter pemasukan/pengeluaran
+#include <thread>     // std::this_thread::sleep_for untuk keuanganDelay()
+#include <chrono>     // std::chrono::milliseconds untuk durasi delay
 
 using namespace std;
 
@@ -240,7 +243,6 @@ void Keuangan::tampilRincianPemasukan() {
     
     printSeparator('=');
     cout << "\n  Tekan Enter untuk kembali...";
-    cin.ignore();
     cin.get();
 }
 
@@ -316,7 +318,6 @@ void Keuangan::tampilRincianPengeluaran() {
     
     printSeparator('=');
     cout << "\n  Tekan Enter untuk kembali...";
-    cin.ignore();
     cin.get();
 }
 
@@ -375,7 +376,6 @@ void Keuangan::exportToCSV() {
     cout << "  Lokasi : " << fullPath << endl;
     printSeparator('=');
     cout << "\n  Tekan Enter untuk kembali...";
-    cin.ignore();
     cin.get();
 }
 
@@ -436,7 +436,7 @@ int Keuangan::pilihLaporan() {
         
         menuLaporan();
         cout << "  Silahkan Pilih Menu (1/2/3): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 3);
         
         switch (Pilihan) {
             case 1:
@@ -449,10 +449,8 @@ int Keuangan::pilihLaporan() {
                 break;
             case 3:
                 return 0; // Kembali ke menu keuangan
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                keuanganDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }   
 }
@@ -476,7 +474,7 @@ int Keuangan::pilihMenu() {
         
         menuKeuangan();
         cout << "  Silahkan Pilih Menu (1/2/3): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 3);
         
         switch (Pilihan) {
             case 1:
@@ -491,10 +489,8 @@ int Keuangan::pilihMenu() {
             case 3:
                 // Kembali ke menu utama
                 return 0;
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                keuanganDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }
 }

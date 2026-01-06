@@ -9,14 +9,17 @@
  * ============================================================
  */
 
-#include "../header/Stock.h"
-#include "../header/Database.h"
-#include "../header/PathHelper.h"
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <thread>
-#include <chrono>
+// === HEADER MODUL INTERNAL ===
+#include "../header/Stock.h"      // Deklarasi class Stock untuk manajemen barang
+#include "../header/Database.h"   // Akses datasetBarang untuk CRUD dan penyimpanan JSON
+#include "../header/PathHelper.h" // Path database, validasi input, generate ID transaksi
+
+// === STANDARD LIBRARY ===
+#include <iostream>   // Input/output: cout untuk tampilan menu, cin untuk input user
+#include <algorithm>  // sort() untuk sorting stok, transform() untuk toLower, replace() untuk underscore
+#include <iomanip>    // Manipulator format: setw, setprecision untuk format tabel
+#include <thread>     // std::this_thread::sleep_for untuk stockDelay()
+#include <chrono>     // std::chrono::milliseconds untuk durasi delay
 
 using namespace std;
 
@@ -133,7 +136,7 @@ void Stock::menuSort() {
 /**
  * Fungsi untuk mengubah data stock barang yang sudah ada
  * User dapat mengubah nama, jumlah, dan harga barang
- * @return int - status (1 = berhasil, 0 = gagal)
+ * @return int - status (1 = berhasil, 0 = gagal, -1 = kembali)
  */
 int Stock::ubahStock() {
     Database database;
@@ -149,8 +152,15 @@ int Stock::ubahStock() {
     cout << string(63, '-') << endl;
 
     int codeCari;
-    cout << "\n  Masukkan Code Barang yang ingin diubah: ";
-    cin >> codeCari;
+    cout << "\n  Masukkan Code Barang (0 untuk kembali): ";
+    codeCari = getValidInt("");
+
+    // Jika user input 0, kembali ke menu edit
+    if (codeCari == 0) {
+        cout << "\n  Kembali ke menu edit..." << endl;
+        stockDelay(500);
+        return -1;
+    }
 
     bool ditemukan = false;
 
@@ -181,10 +191,10 @@ int Stock::ubahStock() {
             }
 
             cout << "  Jumlah Barang: "; 
-            cin >> barang.jumlahBarang;
+            barang.jumlahBarang = getValidInt("");
             
             cout << "  Harga Barang : "; 
-            cin >> barang.hargaBarang;
+            barang.hargaBarang = getValidDouble("");
 
             // Simpan perubahan ke file JSON
             database.saveToJson(getDatabasePath());
@@ -209,7 +219,7 @@ int Stock::ubahStock() {
  * Fungsi untuk menambahkan barang baru ke database
  * Code barang akan di-generate otomatis
  * Penambahan barang akan dicatat sebagai pengeluaran
- * @return int - status (1 = berhasil, 0 = gagal)
+ * @return int - status (1 = berhasil, 0 = gagal, -1 = kembali)
  */
 int Stock::tambahBarang() {
     Database database;
@@ -228,13 +238,26 @@ int Stock::tambahBarang() {
     printStockSeparator('-');
 
     // Input nama barang
-    cout << "  Nama Barang  : ";
-    cin.ignore();
+    cout << "  Nama Barang (0 untuk kembali): ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, namaInput);
+
+    // Jika user input 0, kembali ke menu edit
+    if (namaInput == "0") {
+        cout << "\n  Kembali ke menu edit..." << endl;
+        stockDelay(500);
+        return -1;
+    }
 
     // Konversi ke lowercase dan ganti underscore dengan spasi
     namaInput = toLower(namaInput);
     namaInput = underscoreToSpace(namaInput);
+
+    // Cek apakah nama kosong
+    if (namaInput.empty()) {
+        cout << "\n  [!] Nama barang tidak boleh kosong!" << endl;
+        return 0;
+    }
 
     // Cek apakah nama barang sudah ada (duplikat)
     for (const auto& b : datasetBarang) {
@@ -248,11 +271,11 @@ int Stock::tambahBarang() {
 
     // Input jumlah barang
     cout << "  Jumlah Barang: ";
-    cin >> barangBaru.jumlahBarang;
+    barangBaru.jumlahBarang = getValidInt("");
 
     // Input harga barang
     cout << "  Harga Barang : ";
-    cin >> barangBaru.hargaBarang;
+    barangBaru.hargaBarang = getValidDouble("");
 
     // Generate code barang otomatis (code terakhir + 1)
     int maxCode = 999;
@@ -300,7 +323,7 @@ int Stock::tambahBarang() {
 /**
  * Fungsi untuk menghapus barang dari database
  * Setelah penghapusan, code barang akan di-renumber ulang
- * @return int - status (1 = berhasil, 0 = gagal/batal)
+ * @return int - status (1 = berhasil, 0 = gagal/batal, -1 = kembali)
  */
 int Stock::hapusBarang() {
     Database database;
@@ -322,8 +345,15 @@ int Stock::hapusBarang() {
     }
 
     int codeCari;
-    cout << "\n  Masukkan Code Barang yang ingin dihapus: ";
-    cin >> codeCari;
+    cout << "\n  Masukkan Code Barang (0 untuk kembali): ";
+    codeCari = getValidInt("");
+
+    // Jika user input 0, kembali ke menu edit
+    if (codeCari == 0) {
+        cout << "\n  Kembali ke menu edit..." << endl;
+        stockDelay(500);
+        return -1;
+    }
 
     bool ditemukan = false;
     int indexHapus = -1;
@@ -390,7 +420,7 @@ int Stock::pilihEditMenu() {
         clearScreen();
         menuEdit();
         cout << "  Silahkan Pilih Menu (1/2/3/4): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 4);
 
         switch (Pilihan) {
             case 1: {
@@ -398,26 +428,33 @@ int Stock::pilihEditMenu() {
                 char pilihanKembali;
                 do {
                     clearScreen();
-                    ubahStock();
+                    int result = ubahStock();
+                    // Jika user memilih kembali (-1), keluar dari loop
+                    if (result == -1) break;
                     cout << "\n  Ubah data lagi? (y/n): ";
                     cin >> pilihanKembali;
                 } while (pilihanKembali == 'y' || pilihanKembali == 'Y');
                 break;
             }
-            case 2:
+            case 2: {
                 // Tambah barang baru
                 clearScreen();
-                tambahBarang();
-                cout << "\n  Tekan Enter untuk kembali...";
-                cin.ignore();
-                cin.get();
+                int result = tambahBarang();
+                // Jika user tidak memilih kembali, tunggu input
+                if (result != -1) {
+                    cout << "\n  Tekan Enter untuk kembali...";
+                    cin.get();
+                }
                 break;
+            }
             case 3: {
                 // Hapus barang dengan opsi mengulang
                 char pilihanKembali;
                 do {
                     clearScreen();
-                    hapusBarang();
+                    int result = hapusBarang();
+                    // Jika user memilih kembali (-1), keluar dari loop
+                    if (result == -1) break;
                     cout << "\n  Hapus barang lagi? (y/n): ";
                     cin >> pilihanKembali;
                 } while (pilihanKembali == 'y' || pilihanKembali == 'Y');
@@ -426,10 +463,8 @@ int Stock::pilihEditMenu() {
             case 4:
                 // Kembali ke menu sebelumnya
                 return 2;
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                stockDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }
 }
@@ -459,7 +494,7 @@ int Stock::sortFunction() {
         
         menuSort();
         cout << "  Silahkan Pilih Menu (1/2): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 2);
         
         switch (Pilihan) {
             case 1: {
@@ -501,10 +536,8 @@ int Stock::sortFunction() {
             case 2:
                 // Kembali ke menu sebelumnya
                 return 2;
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                stockDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }
 }
@@ -522,7 +555,7 @@ int Stock::pilihMenu() {
         clearScreen();
         menuStock();
         cout << "  Silahkan Pilih Menu (1/2/3): ";
-        cin >> Pilihan;
+        Pilihan = getValidIntInput("", 1, 3);
         
         switch (Pilihan) {
             case 1:
@@ -538,10 +571,8 @@ int Stock::pilihMenu() {
             case 3:
                 // Kembali ke menu utama
                 return 2;
-            default:
-                cout << "\n  Input tidak valid!" << endl;
-                stockDelay(1500);
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     }
     return 0;

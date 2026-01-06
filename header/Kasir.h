@@ -1,7 +1,9 @@
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_KASIR_H
-#include <vector>
-#include <string>
+
+// === STANDARD LIBRARY ===
+#include <vector>  // std::vector untuk extern keranjang (daftar item belanja)
+#include <string>  // std::string untuk namaBarang dalam struct ItemBelanja
 
 struct ItemBelanja {
     std::string namaBarang;

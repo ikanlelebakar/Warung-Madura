@@ -1,15 +1,19 @@
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_PATHHELPER_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_PATHHELPER_H
 
-#include <string>
-#include <filesystem>
-#include <chrono>
-#include <sstream>
-#include <iomanip>
+// === STANDARD LIBRARY ===
+#include <string>      // std::string untuk path dan return value fungsi
+#include <filesystem>  // std::filesystem untuk manipulasi path (fs::path, fs::exists)
+#include <chrono>      // std::chrono untuk mendapatkan timestamp saat ini
+#include <sstream>     // std::ostringstream untuk memformat tanggal/waktu/ID transaksi
+#include <iomanip>     // setw, setfill untuk format tanggal DD-MM-YYYY
+#include <limits>      // numeric_limits untuk cin.ignore() dalam validasi input
+#include <iostream>    // cout/cin untuk fungsi getValidInt, getValidIntInput, getValidDouble
 
+// === WINDOWS-SPECIFIC HEADERS ===
 #ifdef _WIN32
-#include <windows.h>
-#include <shlobj.h>  // For SHGetFolderPathA
+#include <windows.h>   // GetModuleFileNameA() untuk mendapatkan path executable
+#include <shlobj.h>    // SHGetFolderPathA() untuk mendapatkan path folder Documents user
 #endif
 
 namespace fs = std::filesystem;
@@ -152,4 +156,93 @@ inline std::string getCurrentMonthYear() {
     return oss.str();
 }
 
+// ============================================================
+// FUNGSI INPUT VALIDATION
+// ============================================================
+
+/**
+ * Fungsi untuk mendapatkan input integer yang valid dari user
+ * Menangani fail state dan buffer secara otomatis
+ * SOLUSI untuk bug infinite loop pada cin >> int
+ * 
+ * @param prompt - pesan yang ditampilkan ke user
+ * @param min - nilai minimum yang valid
+ * @param max - nilai maksimum yang valid
+ * @return int - nilai integer yang valid dalam range [min, max]
+ */
+inline int getValidIntInput(const std::string& prompt, int min, int max) {
+    int value;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> value;
+        
+        // Cek apakah input berhasil (tidak fail)
+        if (std::cin.fail()) {
+            // Reset fail state agar cin bisa digunakan lagi
+            std::cin.clear();
+            // Kosongkan buffer sampai newline (buang input yang salah)
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "  [!] Input harus berupa angka!" << std::endl;
+        } 
+        // Cek apakah nilai dalam range yang valid
+        else if (value < min || value > max) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "  [!] Input harus antara " << min << " dan " << max << std::endl;
+        } 
+        // Input valid, kembalikan nilai
+        else {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
+/**
+ * Fungsi untuk mendapatkan input integer tanpa batasan range
+ * Cocok untuk input seperti code barang atau jumlah yang bisa berapa saja
+ * 
+ * @param prompt - pesan yang ditampilkan ke user
+ * @return int - nilai integer yang valid
+ */
+inline int getValidInt(const std::string& prompt) {
+    int value;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> value;
+        
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "  [!] Input harus berupa angka!" << std::endl;
+        } else {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
+/**
+ * Fungsi untuk mendapatkan input double yang valid (untuk harga)
+ * 
+ * @param prompt - pesan yang ditampilkan ke user
+ * @return double - nilai double yang valid
+ */
+inline double getValidDouble(const std::string& prompt) {
+    double value;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> value;
+        
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "  [!] Input harus berupa angka!" << std::endl;
+        } else {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
 #endif //IVENTARIS_DAN_KEUANGAN_KONSEP_PATHHELPER_H
+

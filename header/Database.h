@@ -1,8 +1,9 @@
 #ifndef IVENTARIS_DAN_KEUANGAN_KONSEP_DATABASE_H
 #define IVENTARIS_DAN_KEUANGAN_KONSEP_DATABASE_H
 
-#include <string>
-#include <vector>
+// === STANDARD LIBRARY ===
+#include <string>  // std::string untuk nama barang, keterangan transaksi, path file
+#include <vector>  // std::vector untuk extern datasetBarang dan datasetTransaksi
 
 class Database {
 public:

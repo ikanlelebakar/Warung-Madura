@@ -8,15 +8,18 @@
  * ============================================================
  */
 
-#include "../header/Kasir.h"
-#include "../header/Stock.h"
-#include "../header/PathHelper.h"
-#include "../header/Database.h"
-#include "../header/Keuangan.h"
-#include <iostream>
-#include <cstdlib>
-#include <thread>
-#include <chrono>
+// === HEADER MODUL INTERNAL ===
+#include "../header/Kasir.h"      // Class Kasir dan struct ItemBelanja untuk transaksi penjualan
+#include "../header/Stock.h"      // Class Stock untuk manajemen stok barang
+#include "../header/PathHelper.h" // Helper: path database, tanggal/waktu, validasi input
+#include "../header/Database.h"   // Class Database dan struct barang/Transaksi, akses datasetBarang
+#include "../header/Keuangan.h"   // Class Keuangan untuk laporan keuangan
+
+// === STANDARD LIBRARY ===
+#include <iostream>  // Input/output stream: cout, cin, endl untuk tampilan menu dan input user
+#include <cstdlib>   // Fungsi system() untuk clearScreen() - membersihkan layar terminal
+#include <thread>    // std::this_thread untuk delay/jeda antar transisi menu
+#include <chrono>    // std::chrono::milliseconds untuk durasi waktu delay
 
 using namespace std;
 
@@ -122,8 +125,7 @@ int main() {
     do {
         clearScreen();
         Menu();
-        cout << "  Silahkan Pilih Menu (1/2/3/4) : ";
-        cin >> pilihan;
+        pilihan = getValidIntInput("  Silahkan Pilih Menu (1/2/3/4) : ", 1, 4);
 
         // Proses pilihan user menggunakan switch-case
         switch (pilihan) {
@@ -155,13 +157,8 @@ int main() {
                 cout << endl;
                 delay(1000);  // Delay 1 detik sebelum program berakhir
                 break;
-                
-            default:
-                // Input tidak valid
-                cout << "\n  MASUKAN ANDA TIDAK VALID!" << endl;
-                cout << "  Silahkan pilih angka 1-4" << endl;
-                delay(1500);  // Delay agar user bisa membaca pesan error
-                break;
+                // NOTE: default case tidak diperlukan karena validasi
+                // sudah dilakukan oleh getValidIntInput()
         }
     } while (pilihan != 4);
 
