@@ -22,6 +22,7 @@
 #include <vector>     // vector<Transaksi> untuk menyimpan filter pemasukan/pengeluaran
 #include <thread>     // std::this_thread::sleep_for untuk keuanganDelay()
 #include <chrono>     // std::chrono::milliseconds untuk durasi delay
+#include <limits>     // numeric_limits<streamsize>::max() untuk cin.ignore buffer
 
 using namespace std;
 

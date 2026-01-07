@@ -12,6 +12,9 @@ public:
         int codeBarang, jumlahBarang;
         double hargaBarang;   // Harga BELI (modal/pengeluaran)
         double hargaJual;     // Harga JUAL (ke pelanggan, sudah termasuk markup)
+        int expDay;           // Hari expired (1-31), 0 jika tidak ada
+        int expMonth;         // Bulan expired (1-12), 0 jika tidak ada
+        int expYear;          // Tahun expired (e.g. 2026), 0 jika tidak ada
     };
 
     struct Transaksi {

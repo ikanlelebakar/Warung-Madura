@@ -9,8 +9,9 @@
  */
 
 // === HEADER MODUL INTERNAL ===
-#include "../header/Database.h"   // Deklarasi class Database, struct barang dan Transaksi
-#include "../header/PathHelper.h" // hitungHargaJual() untuk backward compatibility
+#include "../header/Database.h"    // Deklarasi class Database, struct barang dan Transaksi
+#include "../header/PathHelper.h"  // hitungHargaJual() untuk backward compatibility
+#include "../header/ExpiredHelper.h" // Logika expired date dan warna ANSI
 
 // === EXTERNAL LIBRARY ===
 #include "json.hpp"  // nlohmann/json - library untuk parsing dan membuat JSON
@@ -83,6 +84,17 @@ void Database::loadFromJson(const std::string& fileName) {
             b.hargaJual = hitungHargaJual(b.hargaBarang);
         }
         
+        // Backward compatibility: data lama mungkin tidak punya expired date
+        if (item.contains("expDay")) {
+            b.expDay = item["expDay"];
+            b.expMonth = item["expMonth"];
+            b.expYear = item["expYear"];
+        } else {
+            b.expDay = 0;
+            b.expMonth = 0;
+            b.expYear = 0;
+        }
+        
         datasetBarang.push_back(b);
     }
 }
@@ -102,7 +114,10 @@ void Database::saveToJson(const std::string& fileName) {
             {"codeBarang", b.codeBarang},
             {"jumlahBarang", b.jumlahBarang},
             {"hargaBarang", b.hargaBarang},
-            {"hargaJual", b.hargaJual}  // Field baru untuk harga jual
+            {"hargaJual", b.hargaJual},
+            {"expDay", b.expDay},
+            {"expMonth", b.expMonth},
+            {"expYear", b.expYear}
         });
     }
 
@@ -135,30 +150,54 @@ bool Database::updateStok(int codeBarang, int stokBaru) {
 // FUNGSI TAMPIL BARANG
 // ============================================================
 
+// Konstanta lebar kolom untuk tabel barang
+const int COL_NAMA = 15;
+const int COL_CODE = 8;
+const int COL_STOK = 8;
+const int COL_HARGA_BELI = 14;
+const int COL_HARGA_JUAL = 14;
+const int COL_EXPIRED = 18;
+const int TABLE_TOTAL_WIDTH = COL_NAMA + COL_CODE + COL_STOK + COL_HARGA_BELI + COL_HARGA_JUAL + COL_EXPIRED;
+
 /**
  * Fungsi untuk menampilkan daftar barang dalam format tabel
- * Menampilkan: Nama, Code, Jumlah, Harga Beli, dan Harga Jual
+ * Menampilkan: Nama, Code, Stok, Harga Beli, Harga Jual, dan Expired
+ * - Nama MERAH jika barang sudah expired
+ * - Nama KUNING jika barang mendekati expired
  */
 void Database::tampilBarang() {
     // Header kolom
     std::cout << std::left
-              << std::setw(15) << "Nama"
-              << std::setw(8) << "Code"
-              << std::setw(8) << "Stok"
-              << std::setw(12) << "Harga Beli"
-              << std::setw(12) << "Harga Jual"
+              << std::setw(COL_NAMA) << "Nama"
+              << std::setw(COL_CODE) << "Code"
+              << std::setw(COL_STOK) << "Stok"
+              << std::setw(COL_HARGA_BELI) << "Harga Beli"
+              << std::setw(COL_HARGA_JUAL) << "Harga Jual"
+              << std::setw(COL_EXPIRED) << "Expired"
               << std::endl;
 
-    std::cout << std::string(55, '-') << std::endl;
+    std::cout << std::string(TABLE_TOTAL_WIDTH, '-') << std::endl;
 
     // Data rows
     for (const auto& barang : datasetBarang) {
+        // Gunakan helper untuk mendapatkan nama dengan warna
+        std::string namaDisplay = getColoredName(
+            barang.nama, 
+            barang.expDay, 
+            barang.expMonth, 
+            barang.expYear
+        );
+        
+        // Hitung padding untuk ANSI escape code (tidak terlihat di terminal)
+        int extraPadding = getAnsiPadding(barang.expDay, barang.expMonth, barang.expYear);
+        
         std::cout << std::left
-                  << std::setw(15) << barang.nama
-                  << std::setw(8) << barang.codeBarang
-                  << std::setw(8) << barang.jumlahBarang
-                  << std::setw(12) << std::fixed << std::setprecision(0) << barang.hargaBarang
-                  << std::setw(12) << std::fixed << std::setprecision(0) << barang.hargaJual
+                  << std::setw(COL_NAMA + extraPadding) << namaDisplay
+                  << std::setw(COL_CODE) << barang.codeBarang
+                  << std::setw(COL_STOK) << barang.jumlahBarang
+                  << std::setw(COL_HARGA_BELI) << std::fixed << std::setprecision(0) << barang.hargaBarang
+                  << std::setw(COL_HARGA_JUAL) << std::fixed << std::setprecision(0) << barang.hargaJual
+                  << formatExpiredDate(barang.expDay, barang.expMonth, barang.expYear)
                   << std::endl;
     }
 }

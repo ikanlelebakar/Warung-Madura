@@ -10,9 +10,10 @@
  */
 
 // === HEADER MODUL INTERNAL ===
-#include "../header/Stock.h"      // Deklarasi class Stock untuk manajemen barang
-#include "../header/Database.h"   // Akses datasetBarang untuk CRUD dan penyimpanan JSON
-#include "../header/PathHelper.h" // Path database, validasi input, generate ID transaksi
+#include "../header/Stock.h"       // Deklarasi class Stock untuk manajemen barang
+#include "../header/Database.h"    // Akses datasetBarang untuk CRUD dan penyimpanan JSON
+#include "../header/PathHelper.h"  // Path database, validasi input, generate ID transaksi
+#include "../header/ExpiredHelper.h" // Logika expired date untuk validasi
 
 // === STANDARD LIBRARY ===
 #include <iostream>   // Input/output: cout untuk tampilan menu, cin untuk input user
@@ -20,6 +21,7 @@
 #include <iomanip>    // Manipulator format: setw, setprecision untuk format tabel
 #include <thread>     // std::this_thread::sleep_for untuk stockDelay()
 #include <chrono>     // std::chrono::milliseconds untuk durasi delay
+#include <limits>     // numeric_limits<streamsize>::max() untuk cin.ignore buffer
 
 using namespace std;
 
@@ -172,16 +174,16 @@ int Stock::ubahStock() {
             // Tampilkan data lama
             cout << "\n  Data lama:" << endl;
             cout << "  -------------------------" << endl;
-            cout << "  Nama   : " << barang.nama << endl;
-            cout << "  Code   : " << barang.codeBarang << endl;
-            cout << "  Jumlah : " << barang.jumlahBarang << endl;
-            cout << "  Harga  : Rp " << fixed << setprecision(0) << barang.hargaBarang << endl;
+            cout << "  Nama    : " << barang.nama << endl;
+            cout << "  Code    : " << barang.codeBarang << endl;
+            cout << "  Jumlah  : " << barang.jumlahBarang << endl;
+            cout << "  Harga   : Rp " << fixed << setprecision(0) << barang.hargaBarang << endl;
+            cout << "  Expired : " << formatExpiredDate(barang.expDay, barang.expMonth, barang.expYear) << endl;
 
             // Input data baru
             cout << "\n  Masukkan data baru:" << endl;
             cout << "  (Untuk spasi gunakan '_' sebagai pengganti)" << endl;
             cout << "  Nama Barang: ";
-            cin.ignore();
             string namaInput;
             getline(cin, namaInput);
             
@@ -193,13 +195,35 @@ int Stock::ubahStock() {
             cout << "  Jumlah Barang: "; 
             barang.jumlahBarang = getValidInt("");
             
-            cout << "  Harga Barang : "; 
+            cout << "  Harga Beli   : "; 
             barang.hargaBarang = getValidDouble("");
+            
+            // Hitung ulang harga jual berdasarkan harga beli baru
+            barang.hargaJual = hitungHargaJual(barang.hargaBarang);
+
+            // Input tanggal expired baru (opsional)
+            cout << "\n  --- Tanggal Expired ---" << endl;
+            cout << "  (Masukkan 0 jika tidak ada expired)" << endl;
+            cout << "  Hari (1-31)  : ";
+            barang.expDay = getValidInt("");
+            
+            if (barang.expDay != 0) {
+                cout << "  Bulan (1-12) : ";
+                barang.expMonth = getValidInt("");
+                cout << "  Tahun (YYYY) : ";
+                barang.expYear = getValidInt("");
+            } else {
+                barang.expMonth = 0;
+                barang.expYear = 0;
+            }
 
             // Simpan perubahan ke file JSON
             database.saveToJson(getDatabasePath());
 
             cout << "\n  [v] Stock berhasil diubah!" << endl;
+            cout << "  Harga Jual  : Rp " << fixed << setprecision(0) << barang.hargaJual << endl;
+            cout << "  Markup      : Rp " << fixed << setprecision(0) << (barang.hargaJual - barang.hargaBarang) << endl;
+            cout << "  Expired     : " << formatExpiredDate(barang.expDay, barang.expMonth, barang.expYear) << endl;
             return 1;
         }
     }
@@ -280,6 +304,23 @@ int Stock::tambahBarang() {
     // Hitung harga jual otomatis dengan markup
     barangBaru.hargaJual = hitungHargaJual(barangBaru.hargaBarang);
 
+    // Input tanggal expired (opsional)
+    cout << "\n  --- Tanggal Expired ---" << endl;
+    cout << "  (Masukkan 0 jika tidak ada expired)" << endl;
+    cout << "  Hari (1-31)  : ";
+    barangBaru.expDay = getValidInt("");
+    
+    if (barangBaru.expDay != 0) {
+        cout << "  Bulan (1-12) : ";
+        barangBaru.expMonth = getValidInt("");
+        cout << "  Tahun (YYYY) : ";
+        barangBaru.expYear = getValidInt("");
+    } else {
+        // Tidak ada expired date
+        barangBaru.expMonth = 0;
+        barangBaru.expYear = 0;
+    }
+
     // Generate code barang otomatis (code terakhir + 1)
     int maxCode = 999;
     for (const auto& b : datasetBarang) {
@@ -316,6 +357,7 @@ int Stock::tambahBarang() {
     cout << "  Harga Beli  : Rp " << fixed << setprecision(0) << barangBaru.hargaBarang << endl;
     cout << "  Harga Jual  : Rp " << fixed << setprecision(0) << barangBaru.hargaJual << endl;
     cout << "  Markup      : Rp " << fixed << setprecision(0) << (barangBaru.hargaJual - barangBaru.hargaBarang) << endl;
+    cout << "  Expired     : " << formatExpiredDate(barangBaru.expDay, barangBaru.expMonth, barangBaru.expYear) << endl;
     cout << "  Pengeluaran : Rp " << fixed << setprecision(0) << trans.jumlah << endl;
     printStockSeparator('=');
 
@@ -535,7 +577,6 @@ int Stock::sortFunction() {
                 
                 cout << string(48, '=') << endl;
                 cout << "\n  Tekan Enter untuk kembali...";
-                cin.ignore();
                 cin.get();
                 break;
             }
