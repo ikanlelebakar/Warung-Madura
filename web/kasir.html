@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir - Warung Madura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🏪</div>
+            <span class="sidebar-logo-text">Warung Madura</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Menu</div>
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="kasir.html" class="sidebar-link active">
+                    <span class="sidebar-link-icon">🛒</span>
+                    <span>Kasir</span>
+                </a>
+                <a href="stock.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">📦</span>
+                    <span>Stock Barang</span>
+                </a>
+                <a href="keuangan.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">💰</span>
+                    <span>Keuangan</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <h1 class="page-title">Kasir</h1>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Manager</div>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Product Grid -->
+                <div class="lg:col-span-2">
+                    <!-- Search Bar -->
+                    <div class="card mb-6">
+                        <div class="flex items-center gap-4">
+                            <input type="text" id="searchInput" class="form-input flex-1"
+                                placeholder="🔍 Cari barang..." oninput="filterProducts()">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-900 mb-4">Pilih Barang</h3>
+                        <div id="barangGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="text-center py-8 col-span-full">
+                                <div class="spinner mx-auto mb-4"></div>
+                                <p class="text-gray-500">Memuat data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Panel -->
+                <div class="lg:col-span-1">
+                    <div class="cart-panel">
+                        <div class="cart-header">🛒 Keranjang</div>
+
+                        <div id="cartItems" class="min-h-[200px]">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🛒</div>
+                                <p>Keranjang kosong</p>
+                            </div>
+                        </div>
+
+                        <div class="cart-total">
+                            <span class="cart-total-label">Total</span>
+                            <span id="cartTotal" class="cart-total-value">Rp 0</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Metode Pembayaran</label>
+                            <select id="metodePembayaran" class="form-input">
+                                <option value="CASH">💵 Cash</option>
+                                <option value="CASHLESS">💳 QRIS / Cashless</option>
+                            </select>
+                        </div>
+
+                        <button onclick="processCheckout()" id="checkoutBtn" class="btn btn-success w-full mb-3"
+                            disabled>
+                            💳 Bayar
+                        </button>
+
+                        <button onclick="clearCart()" class="btn btn-outline w-full">
+                            🗑️ Kosongkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Transaksi Berhasil!</h3>
+            <p id="successTotal" class="text-green-600 text-2xl font-bold mb-2">Total: Rp 0</p>
+            <p id="successId" class="text-gray-500 text-sm mb-6">ID: -</p>
+            <div class="flex gap-3">
+                <button onclick="closeSuccessModal()" class="btn btn-primary flex-1">Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let cart = [];
+        let barangList = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBarang();
+        });
+
+        async function loadBarang() {
+            try {
+                barangList = await getAllBarang();
+                renderBarangGrid();
+            } catch (error) {
+                document.getElementById('barangGrid').innerHTML = `
+                    <div class="text-center py-8 col-span-full text-red-500">
+                        ⚠️ Gagal terhubung ke server
+                    </div>
+                `;
+            }
+        }
+
+        function filterProducts() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = barangList.filter(b => b.nama.toLowerCase().includes(search));
+            renderBarangGrid(filtered);
+        }
+
+        function renderBarangGrid(items = barangList) {
+            const grid = document.getElementById('barangGrid');
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-8 col-span-full text-gray-500">
+                        Tidak ada barang ditemukan
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map(b => `
+                <div onclick="addToCart(${b.codeBarang})" 
+                     class="product-card ${b.jumlahBarang === 0 ? 'disabled' : ''}">
+                    <div class="product-icon">📦</div>
+                    <div class="product-name">${b.nama}</div>
+                    <div class="product-price">${formatRupiah(b.hargaJual)}</div>
+                    <div class="product-stock">Stok: ${b.jumlahBarang}</div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(code) {
+            const barang = barangList.find(b => b.codeBarang === code);
+            if (!barang || barang.jumlahBarang === 0) return;
+
+            const existingItem = cart.find(item => item.codeBarang === code);
+
+            if (existingItem) {
+                if (existingItem.jumlah < barang.jumlahBarang) {
+                    existingItem.jumlah++;
+                } else {
+                    showToast('Stok tidak mencukupi', 'error');
+                    return;
+                }
+            } else {
+                cart.push({
+                    codeBarang: code,
+                    nama: barang.nama,
+                    hargaJual: barang.hargaJual,
+                    jumlah: 1
+                });
+            }
+
+            renderCart();
+        }
+
+        function removeFromCart(code) {
+            cart = cart.filter(item => item.codeBarang !== code);
+            renderCart();
+        }
+
+        function updateQuantity(code, delta) {
+            const item = cart.find(i => i.codeBarang === code);
+            const barang = barangList.find(b => b.codeBarang === code);
+
+            if (item) {
+                const newQty = item.jumlah + delta;
+                if (newQty <= 0) {
+                    removeFromCart(code);
+                } else if (newQty <= barang.jumlahBarang) {
+                    item.jumlah = newQty;
+                    renderCart();
+                } else {
+                    showToast('Stok tidak mencukupi', 'error');
+                }
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛒</div>
+                        <p>Keranjang kosong</p>
+                    </div>
+                `;
+                document.getElementById('cartTotal').textContent = 'Rp 0';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
+            checkoutBtn.disabled = false;
+
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.nama}</div>
+                        <div class="cart-item-price">${formatRupiah(item.hargaJual)}</div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button onclick="updateQuantity(${item.codeBarang}, -1)" class="cart-qty-btn">−</button>
+                        <span class="cart-qty">${item.jumlah}</span>
+                        <button onclick="updateQuantity(${item.codeBarang}, 1)" class="cart-qty-btn">+</button>
+                        <button onclick="removeFromCart(${item.codeBarang})" class="cart-remove">×</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.hargaJual * item.jumlah), 0);
+            document.getElementById('cartTotal').textContent = formatRupiah(total);
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        async function processCheckout() {
+            if (cart.length === 0) return;
+
+            const items = cart.map(item => ({
+                codeBarang: item.codeBarang,
+                jumlah: item.jumlah
+            }));
+
+            const metodePembayaran = document.getElementById('metodePembayaran').value;
+
+            try {
+                const result = await checkout(items, metodePembayaran);
+
+                if (result.success) {
+                    document.getElementById('successTotal').textContent = 'Total: ' + formatRupiah(result.data.totalHarga);
+                    document.getElementById('successId').textContent = 'ID: ' + result.data.transaksiId;
+                    document.getElementById('successModal').classList.add('active');
+
+                    cart = [];
+                    renderCart();
+                    loadBarang();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('Gagal memproses checkout', 'error');
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>

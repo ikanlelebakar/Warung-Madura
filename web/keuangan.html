@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keuangan - Warung Madura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🏪</div>
+            <span class="sidebar-logo-text">Warung Madura</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Menu</div>
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="kasir.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">🛒</span>
+                    <span>Kasir</span>
+                </a>
+                <a href="stock.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">📦</span>
+                    <span>Stock Barang</span>
+                </a>
+                <a href="keuangan.html" class="sidebar-link active">
+                    <span class="sidebar-link-icon">💰</span>
+                    <span>Keuangan</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <h1 class="page-title">Laporan Keuangan</h1>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Manager</div>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card stat-card income">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon income">💰</div>
+                        <div>
+                            <p class="stat-label">Total Pemasukan</p>
+                            <p id="totalPemasukan" class="stat-value income">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card expense">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon expense">💸</div>
+                        <div>
+                            <p class="stat-label">Total Pengeluaran</p>
+                            <p id="totalPengeluaran" class="stat-value expense">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card profit">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon profit">📈</div>
+                        <div>
+                            <p class="stat-label">Laba Bersih</p>
+                            <p id="labaBersih" class="stat-value profit">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex gap-3">
+                    <button onclick="filterTransaksi('semua')" id="btnSemua" class="btn btn-primary">Semua</button>
+                    <button onclick="filterTransaksi('pemasukan')" id="btnPemasukan"
+                        class="btn btn-outline">Pemasukan</button>
+                    <button onclick="filterTransaksi('pengeluaran')" id="btnPengeluaran"
+                        class="btn btn-outline">Pengeluaran</button>
+                </div>
+                <span id="transactionCount" class="text-gray-500 text-sm"></span>
+            </div>
+
+            <!-- Transaction Table -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold text-gray-900 text-lg">Riwayat Transaksi</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Jenis</th>
+                                <th>Keterangan</th>
+                                <th>Metode</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaksiTable">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <div class="spinner mx-auto mb-4"></div>
+                                    <p class="text-gray-500">Memuat data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let allTransaksi = [];
+        let currentFilter = 'semua';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadKeuangan();
+            loadTransaksi();
+        });
+
+        async function loadKeuangan() {
+            try {
+                const keuangan = await getKeuangan();
+                document.getElementById('totalPemasukan').textContent = formatRupiah(keuangan.totalPemasukan);
+                document.getElementById('totalPengeluaran').textContent = formatRupiah(keuangan.totalPengeluaran);
+
+                const laba = keuangan.labaBersih;
+                const labaEl = document.getElementById('labaBersih');
+                labaEl.textContent = formatRupiah(laba);
+            } catch (error) {
+                console.error('Error loading keuangan:', error);
+            }
+        }
+
+        async function loadTransaksi() {
+            try {
+                allTransaksi = await getAllTransaksi();
+                allTransaksi.sort((a, b) => {
+                    const dateA = a.tanggal.split('-').reverse().join('-') + ' ' + a.waktu;
+                    const dateB = b.tanggal.split('-').reverse().join('-') + ' ' + b.waktu;
+                    return dateB.localeCompare(dateA);
+                });
+                renderTransaksi();
+            } catch (error) {
+                document.getElementById('transaksiTable').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-red-500">
+                            ⚠️ Gagal terhubung ke server
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function filterTransaksi(filter) {
+            currentFilter = filter;
+
+            document.getElementById('btnSemua').className = `btn ${filter === 'semua' ? 'btn-primary' : 'btn-outline'}`;
+            document.getElementById('btnPemasukan').className = `btn ${filter === 'pemasukan' ? 'btn-success' : 'btn-outline'}`;
+            document.getElementById('btnPengeluaran').className = `btn ${filter === 'pengeluaran' ? 'btn-danger' : 'btn-outline'}`;
+
+            renderTransaksi();
+        }
+
+        function renderTransaksi() {
+            const filtered = currentFilter === 'semua'
+                ? allTransaksi
+                : allTransaksi.filter(t => t.jenis === currentFilter);
+
+            document.getElementById('transactionCount').textContent = `${filtered.length} transaksi`;
+
+            const tbody = document.getElementById('transaksiTable');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-12 text-gray-500">
+                            📋 Belum ada transaksi
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(t => `
+                <tr>
+                    <td class="font-medium">${t.tanggal}</td>
+                    <td class="text-gray-500">${t.waktu}</td>
+                    <td>
+                        <span class="badge ${t.jenis === 'pemasukan' ? 'badge-success' : 'badge-danger'}">
+                            ${t.jenis === 'pemasukan' ? '↑ Pemasukan' : '↓ Pengeluaran'}
+                        </span>
+                    </td>
+                    <td>${t.keterangan}</td>
+                    <td class="text-gray-500">${t.metodePembayaran || '-'}</td>
+                    <td class="font-medium ${t.jenis === 'pemasukan' ? 'text-green-600' : 'text-red-600'}">
+                        ${t.jenis === 'pemasukan' ? '+' : '-'}${formatRupiah(t.jumlah)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+
+</html>

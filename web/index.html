@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Warung Madura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🏪</div>
+            <span class="sidebar-logo-text">Warung Madura</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Menu</div>
+                <a href="index.html" class="sidebar-link active">
+                    <span class="sidebar-link-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="kasir.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">🛒</span>
+                    <span>Kasir</span>
+                </a>
+                <a href="stock.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">📦</span>
+                    <span>Stock Barang</span>
+                </a>
+                <a href="keuangan.html" class="sidebar-link">
+                    <span class="sidebar-link-icon">💰</span>
+                    <span>Keuangan</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <h1 class="page-title">Dashboard</h1>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Manager</div>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Barang -->
+                <div class="card stat-card items">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon items">📦</div>
+                        <div>
+                            <p class="stat-label">Total Barang</p>
+                            <p id="totalBarang" class="stat-value">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Pemasukan -->
+                <div class="card stat-card income">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon income">💰</div>
+                        <div>
+                            <p class="stat-label">Total Pemasukan</p>
+                            <p id="totalPemasukan" class="stat-value income">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Pengeluaran -->
+                <div class="card stat-card expense">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon expense">💸</div>
+                        <div>
+                            <p class="stat-label">Total Pengeluaran</p>
+                            <p id="totalPengeluaran" class="stat-value expense">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Laba Bersih -->
+                <div class="card stat-card profit">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon profit">📈</div>
+                        <div>
+                            <p class="stat-label">Laba Bersih</p>
+                            <p id="labaBersih" class="stat-value profit">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <a href="kasir.html" class="card hover:shadow-lg transition-shadow cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon income group-hover:scale-110 transition-transform">🛒</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Mulai Transaksi</h3>
+                            <p class="text-sm text-gray-500">Buka kasir untuk penjualan</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="stock.html" class="card hover:shadow-lg transition-shadow cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon items group-hover:scale-110 transition-transform">📋</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Kelola Stock</h3>
+                            <p class="text-sm text-gray-500">Tambah atau edit barang</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="keuangan.html" class="card hover:shadow-lg transition-shadow cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon profit group-hover:scale-110 transition-transform">📊</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Laporan Keuangan</h3>
+                            <p class="text-sm text-gray-500">Lihat rincian transaksi</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Recent Stock Table -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold text-gray-900 text-lg">Daftar Barang</h3>
+                    <a href="stock.html" class="text-blue-500 hover:text-blue-600 text-sm font-medium">Lihat Semua →</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Kode</th>
+                                <th>Stok</th>
+                                <th>Harga Beli</th>
+                                <th>Harga Jual</th>
+                            </tr>
+                        </thead>
+                        <tbody id="barangTable">
+                            <tr>
+                                <td colspan="5" class="text-center py-8">
+                                    <div class="spinner mx-auto mb-4"></div>
+                                    <p class="text-gray-500">Memuat data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadDashboard();
+        });
+
+        async function loadDashboard() {
+            try {
+                // Load keuangan data
+                const keuangan = await getKeuangan();
+                document.getElementById('totalPemasukan').textContent = formatRupiah(keuangan.totalPemasukan);
+                document.getElementById('totalPengeluaran').textContent = formatRupiah(keuangan.totalPengeluaran);
+                document.getElementById('labaBersih').textContent = formatRupiah(keuangan.labaBersih);
+
+                // Load barang data
+                const barangList = await getAllBarang();
+                document.getElementById('totalBarang').textContent = barangList.length;
+
+                // Render table
+                const tbody = document.getElementById('barangTable');
+                if (barangList.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">
+                                Belum ada barang. <a href="stock.html" class="text-blue-500 hover:underline">Tambah sekarang</a>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = barangList.slice(0, 5).map(b => `
+                        <tr>
+                            <td class="font-medium">${b.nama}</td>
+                            <td class="text-gray-500">${b.codeBarang}</td>
+                            <td>
+                                <span class="badge ${b.jumlahBarang < 5 ? 'badge-danger' : 'badge-success'}">
+                                    ${b.jumlahBarang}
+                                </span>
+                            </td>
+                            <td>${formatRupiah(b.hargaBarang)}</td>
+                            <td class="text-green-600 font-medium">${formatRupiah(b.hargaJual)}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('barangTable').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-red-500">
+                            ⚠️ Gagal terhubung ke server. Pastikan backend berjalan di localhost:8080
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>
