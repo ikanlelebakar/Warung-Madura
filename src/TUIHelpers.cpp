@@ -274,4 +274,56 @@ bool isFlashSaleEligible(const Database::barang& b) {
     return getFlashSaleInfo(b).isOnSale;
 }
 
+// ============================================================
+// EXPIRED STOCK AUTO-REMOVAL IMPLEMENTATION
+// ============================================================
+
+bool isItemExpired(const Database::barang& b) {
+    return isExpired(b.expDay, b.expMonth, b.expYear);
+}
+
+std::vector<std::string> processExpiredStock(Database& db, 
+                                              const std::string& dbPath,
+                                              const std::string& transaksiPath) {
+    std::vector<std::string> removedItems;
+    bool dataChanged = false;
+    
+    // Scan all items for expired stock
+    for (auto& b : datasetBarang) {
+        // Check if item is expired AND has stock > 0
+        if (isItemExpired(b) && b.jumlahBarang > 0) {
+            // Calculate loss amount (hargaBeli * quantity)
+            double lossAmount = b.hargaBarang * b.jumlahBarang;
+            int removedQty = b.jumlahBarang;
+            
+            // Reset stock to 0
+            b.jumlahBarang = 0;
+            dataChanged = true;
+            
+            // Record as "kehilangan" transaction
+            Database::Transaksi trans;
+            trans.id = generateTransactionId();
+            trans.tanggal = getCurrentDate();
+            trans.waktu = getCurrentTime();
+            trans.jenis = "kehilangan";
+            trans.keterangan = "Expired: " + b.nama + " (x" + std::to_string(removedQty) + ")";
+            trans.jumlah = lossAmount;
+            trans.metodePembayaran = "";
+            
+            db.tambahTransaksi(trans);
+            
+            // Add to notification list
+            removedItems.push_back(b.nama);
+        }
+    }
+    
+    // Save changes if any items were removed
+    if (dataChanged) {
+        db.saveToJson(dbPath);
+        db.saveTransaksi(transaksiPath);
+    }
+    
+    return removedItems;
+}
+
 } // namespace TUI

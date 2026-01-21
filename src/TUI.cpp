@@ -12,6 +12,9 @@
 
 using namespace ftxui;
 
+// Global keranjang belanja (moved from deleted Kasir.cpp)
+std::vector<ItemBelanja> keranjang;
+
 namespace TUI {
 
 void Run() {
@@ -23,6 +26,9 @@ void Run() {
     db.loadFromJson(dbPath);
     db.loadTransaksi(transaksiPath);
     
+    // Auto-remove expired stock at startup
+    std::vector<std::string> expiredRemoved = processExpiredStock(db, dbPath, transaksiPath);
+    
     auto screen = ScreenInteractive::Fullscreen();
     
     // View states:
@@ -32,7 +38,17 @@ void Run() {
     // 7 = Keuangan Menu, 10 = Keuangan Ringkasan, 11 = Pemasukan, 12 = Pengeluaran, 13 = Export Result
     int viewState = 0;
     int mainMenuSelected = 0, kasirMenuSelected = 0, stockMenuSelected = 0, keuanganMenuSelected = 0;
-    std::string statusMsg = "Selamat datang! Gunakan Arrow Keys dan Enter.";
+    // Build startup message with expired notifications if any
+    std::string statusMsg;
+    if (!expiredRemoved.empty()) {
+        statusMsg = "Expired removed: ";
+        for (size_t i = 0; i < expiredRemoved.size(); ++i) {
+            if (i > 0) statusMsg += ", ";
+            statusMsg += expiredRemoved[i];
+        }
+    } else {
+        statusMsg = "Selamat datang! Gunakan Arrow Keys dan Enter.";
+    }
     std::string exportPath = "";
     
     // Payment method state (from main branch)
@@ -214,7 +230,11 @@ void Run() {
                 try {
                     int code = std::stoi(kasirCode), jumlah = std::stoi(kasirJumlah); bool found = false;
                     for (auto& b : datasetBarang) if (b.codeBarang == code) { found = true;
-                        if (jumlah > b.jumlahBarang) statusMsg = "Stock tidak cukup!";
+                        // Block expired items from being sold
+                        if (TUI::isItemExpired(b)) {
+                            statusMsg = b.nama + " sudah expired! Tidak dapat dijual.";
+                        }
+                        else if (jumlah > b.jumlahBarang) statusMsg = "Stock tidak cukup!";
                         else { 
                             // Use effective price for cart (supports flash sale)
                             double effectivePrice = TUI::getEffectivePrice(b);

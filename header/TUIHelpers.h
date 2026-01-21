@@ -86,6 +86,31 @@ double getEffectivePrice(const Database::barang& b);
 // Check if an item qualifies for flash sale
 bool isFlashSaleEligible(const Database::barang& b);
 
+// ============================================================
+// EXPIRED STOCK AUTO-REMOVAL
+// ============================================================
+
+/**
+ * Process all stock items and auto-remove expired items:
+ * - If item is expired AND stock > 0:
+ *   - Reset stock to 0
+ *   - Record as "kehilangan" transaction (loss)
+ *   - Add item name to return list
+ * 
+ * @param db Reference to Database for saving changes
+ * @param dbPath Path to database.json
+ * @param transaksiPath Path to transaksi.json
+ * @return Vector of removed item names (for notification display)
+ */
+std::vector<std::string> processExpiredStock(Database& db, 
+                                              const std::string& dbPath,
+                                              const std::string& transaksiPath);
+
+/**
+ * Check if an item is expired (convenience wrapper)
+ */
+bool isItemExpired(const Database::barang& b);
+
 }
 
 #endif //IVENTARIS_DAN_KEUANGAN_KONSEP_TUI_HELPERS_H

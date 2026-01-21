@@ -48,7 +48,6 @@ endif()
 add_executable(Iventaris_Dan_Keuangan_Konsep
         src/Main.cpp
         src/Database.cpp
-        src/Kasir.cpp
         src/TUI.cpp
         src/TUIComponents.cpp
         src/TUIHelpers.cpp
@@ -56,8 +55,6 @@ add_executable(Iventaris_Dan_Keuangan_Konsep
         header/Kasir.h
         header/Database.h
         header/PathHelper.h
-        header/Stock.h
-        header/Keuangan.h
         header/TUI.h
         header/TUIComponents.h
         header/TUIHelpers.h
