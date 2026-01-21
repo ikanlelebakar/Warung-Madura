@@ -17,7 +17,7 @@ git clone -b main https://github.com/ikanlelebakar/Warung-Madura.git
 cd Warung-Madura
 ```
 
-### Branch TUI (Text User Interface Version) (Udah Gak Update)
+### Branch TUI (Text User Interface Version)
 
 ```bash
 git clone -b TUI https://github.com/ikanlelebakar/Warung-Madura.git
