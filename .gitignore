@@ -49,3 +49,5 @@ cmake-build-release/
 # Visual Studio / VS Code
 .vs
 .vscode
+
+Database/
