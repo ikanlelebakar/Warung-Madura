@@ -15,6 +15,7 @@
 #include <string>    // std::string untuk return value
 #include <chrono>    // std::chrono untuk mendapatkan waktu sistem
 #include <ctime>     // struct tm untuk manipulasi tanggal
+#include <climits>   // LLONG_MAX untuk getDaysUntilExpired()
 
 // ============================================================
 // KONSTANTA ANSI COLOR CODE
@@ -81,6 +82,29 @@ inline long long getTodayInDays() {
 #endif
     
     return dateToDays(tm_now.tm_mday, tm_now.tm_mon + 1, tm_now.tm_year + 1900);
+}
+
+/**
+ * Menghitung jumlah hari sampai expired
+ * Digunakan untuk menentukan tier flash sale
+ * 
+ * @param expDay   - hari expired
+ * @param expMonth - bulan expired
+ * @param expYear  - tahun expired
+ * @return long long - jumlah hari sampai expired
+ *         LLONG_MAX jika tidak ada tanggal expired
+ *         Nilai negatif jika sudah expired
+ */
+inline long long getDaysUntilExpired(int expDay, int expMonth, int expYear) {
+    // Jika tidak ada tanggal expired, return nilai sangat besar
+    if (expDay == 0 || expMonth == 0 || expYear == 0) {
+        return LLONG_MAX;
+    }
+    
+    long long expiredDays = dateToDays(expDay, expMonth, expYear);
+    long long todayDays = getTodayInDays();
+    
+    return expiredDays - todayDays;
 }
 
 /**

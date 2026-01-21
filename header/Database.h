@@ -28,11 +28,10 @@ public:
     };
 
     // Barang functions
-    void tampilBarang();
     void loadFromJson(const std::string& fileName);
     void saveToJson(const std::string& fileName);
-    bool updateStok(int codeBarang, int stokBaru);
     void initDatabase(const std::string& fileName);
+    void reindexCodes();
 
     // Transaksi functions
     void loadTransaksi(const std::string& fileName);

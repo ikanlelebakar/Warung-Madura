@@ -1,15 +1,32 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.14)
 project(Iventaris_Dan_Keuangan_Konsep)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Fetch FTXUI library
+include(FetchContent)
+
+set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
+FetchContent_Declare(ftxui
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+    GIT_TAG v5.0.0
+)
+
+FetchContent_GetProperties(ftxui)
+if(NOT ftxui_POPULATED)
+    FetchContent_Populate(ftxui)
+    add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # Static linking untuk MinGW agar tidak perlu DLL
 if(MINGW)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 endif()
 
+# Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/header)
 
 # Buat folder Database di build directory
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Database)
@@ -29,14 +46,26 @@ if(NOT EXISTS ${CMAKE_BINARY_DIR}/Database/transaksi.json)
 endif()
 
 add_executable(Iventaris_Dan_Keuangan_Konsep
-        scr/Main.cpp
-        scr/Kasir.cpp
-        scr/Database.cpp
-        scr/Stock.cpp
-        scr/Keuangan.cpp
+        src/Main.cpp
+        src/Database.cpp
+        src/Kasir.cpp
+        src/TUI.cpp
+        src/TUIComponents.cpp
+        src/TUIHelpers.cpp
+        src/TUIViews.cpp
         header/Kasir.h
         header/Database.h
-        header/Stock.h
         header/PathHelper.h
+        header/Stock.h
         header/Keuangan.h
+        header/TUI.h
+        header/TUIComponents.h
+        header/TUIHelpers.h
+        header/TUIViews.h
+)
+
+target_link_libraries(Iventaris_Dan_Keuangan_Konsep
+    PRIVATE ftxui::screen
+    PRIVATE ftxui::dom
+    PRIVATE ftxui::component
 )

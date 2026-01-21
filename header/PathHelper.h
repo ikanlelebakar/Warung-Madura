@@ -18,6 +18,10 @@
 
 namespace fs = std::filesystem;
 
+// ============================================================
+// PATH FUNCTIONS
+// ============================================================
+
 inline std::string getDatabasePath() {
     fs::path exePath;
     
@@ -31,19 +35,16 @@ inline std::string getDatabasePath() {
     
     fs::path dbPath;
     
-    // Coba path dari cmake-build-debug (../Database/database.json)
     dbPath = exePath.parent_path() / "Database" / "database.json";
     if (fs::exists(dbPath.parent_path())) {
         return dbPath.string();
     }
     
-    // Coba path dari folder root project (Database/database.json)
     dbPath = exePath / "Database" / "database.json";
     if (fs::exists(dbPath.parent_path())) {
         return dbPath.string();
     }
     
-    // Fallback ke current working directory
     dbPath = fs::current_path() / "Database" / "database.json";
     return dbPath.string();
 }
@@ -61,19 +62,16 @@ inline std::string getTransaksiPath() {
     
     fs::path tPath;
     
-    // Coba path dari cmake-build-debug (../Database/transaksi.json)
     tPath = exePath.parent_path() / "Database" / "transaksi.json";
     if (fs::exists(tPath.parent_path())) {
         return tPath.string();
     }
     
-    // Coba path dari folder root project (Database/transaksi.json)
     tPath = exePath / "Database" / "transaksi.json";
     if (fs::exists(tPath.parent_path())) {
         return tPath.string();
     }
     
-    // Fallback ke current working directory
     tPath = fs::current_path() / "Database" / "transaksi.json";
     return tPath.string();
 }
@@ -85,11 +83,13 @@ inline std::string getDocumentsPath() {
         return std::string(path);
     }
 #endif
-    // Fallback ke current directory
     return fs::current_path().string();
 }
 
-// Helper function untuk mendapatkan tanggal saat ini (format: DD-MM-YYYY)
+// ============================================================
+// DATE/TIME FUNCTIONS
+// ============================================================
+
 inline std::string getCurrentDate() {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);
@@ -108,7 +108,6 @@ inline std::string getCurrentDate() {
     return oss.str();
 }
 
-// Helper function untuk mendapatkan waktu saat ini (format: HH:MM:SS)
 inline std::string getCurrentTime() {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);
@@ -127,7 +126,6 @@ inline std::string getCurrentTime() {
     return oss.str();
 }
 
-// Helper function untuk generate transaction ID (timestamp-based)
 inline std::string generateTransactionId() {
     auto now = std::chrono::system_clock::now();
     auto duration = now.time_since_epoch();
@@ -138,7 +136,6 @@ inline std::string generateTransactionId() {
     return oss.str();
 }
 
-// Helper function untuk mendapatkan bulan dan tahun saat ini (format: YYYY_MM)
 inline std::string getCurrentMonthYear() {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);
